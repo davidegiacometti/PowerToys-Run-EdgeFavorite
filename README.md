@@ -18,3 +18,9 @@ Simple [PowerToys Run](https://learn.microsoft.com/windows/powertoys/run) experi
 - Download the latest release
 - Extract to `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins`
 - Restart PowerToys
+
+## Screenshots
+
+![Plugin Manager](/images/PluginManager.png)
+
+![Plugin Manager](/images/Search.png)
