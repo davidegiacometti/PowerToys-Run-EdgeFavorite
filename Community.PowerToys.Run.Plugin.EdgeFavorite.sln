@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Community.PowerToys.Run.Plugin.EdgeFavorite", "Community.PowerToys.Run.Plugin.EdgeFavorite\Community.PowerToys.Run.Plugin.EdgeFavorite.csproj", "{18D111C3-66B7-49F6-A4AB-6485D903C1FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Community.PowerToys.Run.Plugin.EdgeFavorite.Tests", "Community.PowerToys.Run.Plugin.EdgeFavorite.Tests\Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.csproj", "{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{90031F25-FF55-4164-B616-7D1450451ED5}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Debug|ARM64.Build.0 = Debug|ARM64
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Debug|x64.ActiveCfg = Debug|x64
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Debug|x64.Build.0 = Debug|x64
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Release|ARM64.ActiveCfg = Release|ARM64
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Release|ARM64.Build.0 = Release|ARM64
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Release|x64.ActiveCfg = Release|x64
+		{18D111C3-66B7-49F6-A4AB-6485D903C1FA}.Release|x64.Build.0 = Release|x64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Debug|ARM64.Build.0 = Debug|ARM64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Debug|x64.ActiveCfg = Debug|x64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Debug|x64.Build.0 = Debug|x64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Release|ARM64.ActiveCfg = Release|ARM64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Release|ARM64.Build.0 = Release|ARM64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Release|x64.ActiveCfg = Release|x64
+		{D293A7C2-70BC-43F2-BAC3-1E43CD1DAE36}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F2F8C61-D1F4-42AC-8A67-2D56308CB5A5}
+	EndGlobalSection
+EndGlobal
