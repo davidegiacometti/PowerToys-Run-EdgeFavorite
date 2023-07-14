@@ -15,9 +15,10 @@ Simple [PowerToys Run](https://learn.microsoft.com/windows/powertoys/run) experi
 
 ## Installation
 
-- Download the latest release
-- Extract to `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins`
-- Restart PowerToys
+- Download the [latest release](https://github.com/davidegiacometti/PowerToys-Run-EdgeFavorite/releases/) by selecting the architecture that matches your machine: `x64` (more common) or `ARM64`
+- Close PowerToys
+- Extract the archive to `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins`
+- Open PowerToys
 
 ## Screenshots
 
