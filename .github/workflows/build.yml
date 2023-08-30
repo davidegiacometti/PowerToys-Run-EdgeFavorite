@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  PLUGIN_NAME: EdgeFavorite
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [x64, ARM64]
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Read version
+        run: |
+          [xml]$xml = Get-Content -Path Directory.Build.Props
+          echo "PLUGIN_VERSION=$($xml.Project.PropertyGroup.Version)" >> $env:GITHUB_ENV
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Build
+        run: dotnet build Community.PowerToys.Run.Plugin.EdgeFavorite.sln --configuration Release /p:Platform=${{matrix.platform}} /p:EnableWindowsTargeting=true
+
+      - name: Test
+        if: ${{matrix.platform == 'x64'}}
+        run: dotnet test Community.PowerToys.Run.Plugin.EdgeFavorite.sln --no-build --verbosity normal --configuration Release /p:Platform=${{matrix.platform}}
+
+      - name: Prepare artifact
+        run: |
+          Remove-Item -Path Community.PowerToys.Run.Plugin.EdgeFavorite\bin\* -Recurse -Include *.xml, *.pdb, PowerToys.*, Wox.*
+          Rename-Item -Path Community.PowerToys.Run.Plugin.EdgeFavorite\bin\${{matrix.platform}}\Release -NewName $env:PLUGIN_NAME
+          Compress-Archive -Path Community.PowerToys.Run.Plugin.EdgeFavorite\bin\${{matrix.platform}}\$env:PLUGIN_NAME -DestinationPath "${{env.PLUGIN_NAME}}-${{env.PLUGIN_VERSION}}-${{matrix.platform}}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{env.PLUGIN_NAME}}-${{env.PLUGIN_VERSION}}
+          path: "**/*.zip"
