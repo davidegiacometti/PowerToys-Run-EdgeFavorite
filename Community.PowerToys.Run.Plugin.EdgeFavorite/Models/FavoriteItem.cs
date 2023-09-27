@@ -4,8 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Input;
 using ManagedCommon;
+using Wox.Infrastructure;
 using Wox.Plugin;
+using Wox.Plugin.Logger;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 {
@@ -45,7 +49,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             _childrens.Add(item);
         }
 
-        public Result Create()
+        public Result CreateResult()
         {
             return Type switch
             {
@@ -55,6 +59,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     SubTitle = $"Folder: {Path}",
                     IcoPath = _folderIcoPath,
                     QueryTextDisplay = Path,
+                    ContextData = this,
                 },
                 FavoriteType.Url => new Result
                 {
@@ -64,13 +69,60 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     QueryTextDisplay = Path,
                     Action = _ =>
                     {
-                        Wox.Infrastructure.Helper.OpenInShell($"microsoft-edge:{Url}");
+                        Helper.OpenInShell($"microsoft-edge:{Url}");
                         return true;
                     },
                     ToolTipData = new ToolTipData(Name, Url),
+                    ContextData = this,
                 },
                 _ => throw new ArgumentException(),
             };
+        }
+
+        public List<ContextMenuResult> CreateContextMenuResult()
+        {
+            if (Type == FavoriteType.Url)
+            {
+                return new List<ContextMenuResult>
+                {
+                    new ContextMenuResult
+                    {
+                        Title = "Copy URL (Ctrl+C)",
+                        Glyph = "\xE8C8",
+                        FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
+                        AcceleratorKey = Key.C,
+                        AcceleratorModifiers = ModifierKeys.Control,
+                        Action = _ =>
+                        {
+                            try
+                            {
+                                Clipboard.SetText(Url);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Exception("Failed to copy URL to clipboard", ex, typeof(FavoriteItem));
+                            }
+
+                            return true;
+                        },
+                    },
+                    new ContextMenuResult
+                    {
+                        Title = "Open InPrivate (Ctrl+P)",
+                        Glyph = "\xE727",
+                        FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
+                        AcceleratorKey = Key.P,
+                        AcceleratorModifiers = ModifierKeys.Control,
+                        Action = _ =>
+                        {
+                            Helper.OpenInShell(@"shell:AppsFolder\Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge", $"-private {Url}");
+                            return true;
+                        },
+                    },
+                };
+            }
+
+            return new List<ContextMenuResult>();
         }
 
         public static void SetIcons(Theme theme)

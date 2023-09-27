@@ -14,9 +14,10 @@ using Wox.Plugin;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 {
-    public class Main : IPlugin, ISettingProvider
+    public class Main : IPlugin, ISettingProvider, IContextMenu
     {
         private const string SearchTree = nameof(SearchTree);
+        private const bool SearchTreeDefault = false;
         private readonly IFavoriteProvider _favoriteProvider;
         private readonly IFavoriteQuery _favoriteQuery;
         private PluginInitContext? _context;
@@ -31,7 +32,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             new PluginAdditionalOption
             {
                 Key = SearchTree,
-                Value = true,
+                Value = SearchTreeDefault,
                 DisplayLabel = "Search as tree",
                 DisplayDescription = "Navigate the original directory tree when searching.",
             },
@@ -60,7 +61,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                     .Search(_favoriteProvider.Root, search, 0)
                     .OrderBy(f => f.Type)
                     .ThenBy(f => f.Name)
-                    .Select(f => f.Create())
+                    .Select(f => f.CreateResult())
                     .ToList();
             }
             else
@@ -72,7 +73,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                     var score = StringMatcher.FuzzySearch(query.Search, favorite.Name);
                     if (string.IsNullOrWhiteSpace(query.Search) || score.Score > 0)
                     {
-                        var result = favorite.Create();
+                        var result = favorite.CreateResult();
                         result.Score = score.Score;
                         result.TitleHighlightData = score.MatchData;
                         results.Add(result);
@@ -92,12 +93,22 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         {
             if (settings != null && settings.AdditionalOptions != null)
             {
-                _searchTree = settings.AdditionalOptions.FirstOrDefault(x => x.Key == SearchTree)?.Value ?? true;
+                _searchTree = settings.AdditionalOptions.FirstOrDefault(x => x.Key == SearchTree)?.Value ?? SearchTreeDefault;
             }
             else
             {
-                _searchTree = true;
+                _searchTree = SearchTreeDefault;
             }
+        }
+
+        public List<ContextMenuResult> LoadContextMenus(Result selectedResult)
+        {
+            if (selectedResult.ContextData is not FavoriteItem favorite)
+            {
+                return new List<ContextMenuResult>();
+            }
+
+            return favorite.CreateContextMenuResult();
         }
 
         private void OnThemeChanged(Theme currentTheme, Theme newTheme)
