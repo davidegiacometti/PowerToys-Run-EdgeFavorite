@@ -89,7 +89,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     {
                         Title = "Copy URL (Ctrl+C)",
                         Glyph = "\xE8C8",
-                        FontFamily = "Segoe MDL2 Assets",
+                        FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.C,
                         AcceleratorModifiers = ModifierKeys.Control,
                         Action = _ =>
@@ -110,7 +110,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     {
                         Title = "Open InPrivate (Ctrl+P)",
                         Glyph = "\xE727",
-                        FontFamily = "Segoe MDL2 Assets",
+                        FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.P,
                         AcceleratorModifiers = ModifierKeys.Control,
                         Action = _ =>
