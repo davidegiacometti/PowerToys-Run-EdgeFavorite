@@ -16,6 +16,8 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 {
     public class Main : IPlugin, ISettingProvider, IContextMenu
     {
+        public static string PluginID => "D73A7EF0633F4C82A14454FFD848F447";
+
         private const string SearchTree = nameof(SearchTree);
         private const bool SearchTreeDefault = false;
         private readonly IFavoriteProvider _favoriteProvider;

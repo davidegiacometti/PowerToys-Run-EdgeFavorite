@@ -11,7 +11,7 @@ Simple [PowerToys Run](https://learn.microsoft.com/windows/powertoys/run) experi
 ## Requirements
 
 - Microsoft Edge set as default browser
-- PowerToys minimum version 0.68.0
+- PowerToys minimum version 0.75.0
 
 ## Installation
 
