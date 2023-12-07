@@ -67,7 +67,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
             _root = newRoot;
         }
 
-        private void ProcessFavorites(JsonElement element, FavoriteItem parent, string path, bool root)
+        private static void ProcessFavorites(JsonElement element, FavoriteItem parent, string path, bool root)
         {
             if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("children", out var children))
             {

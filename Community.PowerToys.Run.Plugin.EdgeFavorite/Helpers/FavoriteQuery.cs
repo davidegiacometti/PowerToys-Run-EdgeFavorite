@@ -32,10 +32,10 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
         {
             if (depth == path.Length - 1)
             {
-                return node.Childrens.Where(f => f.Name != null && f.Name.StartsWith(path[depth], StringComparison.InvariantCultureIgnoreCase));
+                return node.Childrens.Where(f => f.Name != null && f.Name.StartsWith(path[depth], StringComparison.OrdinalIgnoreCase));
             }
 
-            var folder = node.Childrens.SingleOrDefault(f => f.Type == FavoriteType.Folder && f.Name != null && f.Name.Equals(path[depth], StringComparison.InvariantCultureIgnoreCase));
+            var folder = node.Childrens.SingleOrDefault(f => f.Type == FavoriteType.Folder && f.Name != null && f.Name.Equals(path[depth], StringComparison.OrdinalIgnoreCase));
 
             if (folder != null)
             {

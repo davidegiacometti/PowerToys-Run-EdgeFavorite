@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using ManagedCommon;
@@ -15,6 +16,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 {
     public class FavoriteItem
     {
+        private static readonly string _pluginName = Assembly.GetExecutingAssembly().GetName().Name ?? string.Empty;
         private static string? _folderIcoPath;
         private static string? _urlIcoPath;
         private readonly List<FavoriteItem> _childrens = new();
@@ -92,6 +94,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.C,
                         AcceleratorModifiers = ModifierKeys.Control,
+                        PluginName = _pluginName,
                         Action = _ =>
                         {
                             try
@@ -113,6 +116,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.P,
                         AcceleratorModifiers = ModifierKeys.Control,
+                        PluginName = _pluginName,
                         Action = _ =>
                         {
                             Helper.OpenInShell(@"shell:AppsFolder\Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge", $"-private {Url}");
