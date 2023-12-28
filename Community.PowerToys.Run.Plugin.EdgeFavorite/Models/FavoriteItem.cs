@@ -119,7 +119,15 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         PluginName = _pluginName,
                         Action = _ =>
                         {
-                            Helper.OpenInShell(@"shell:AppsFolder\Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge", $"-private {Url}");
+                            try
+                            {
+                                Helper.OpenInShell(@"shell:AppsFolder\Microsoft.MicrosoftEdge.Stable_8wekyb3d8bbwe!App", $"-inprivate {Url}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Exception("Failed to launch Microsoft Edge", ex, typeof(FavoriteItem));
+                            }
+
                             return true;
                         },
                     },
