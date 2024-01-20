@@ -11,14 +11,18 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 {
     public class FavoriteProvider : IFavoriteProvider
     {
-        private readonly string _path = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Bookmarks");
+        private readonly string _path;
         private readonly FileSystemWatcher _watcher;
         private FavoriteItem _root;
 
         public FavoriteItem Root => _root;
 
-        public FavoriteProvider()
+        public ProfileInfo ProfileInfo { get; }
+
+        public FavoriteProvider(string path, ProfileInfo profileInfo)
         {
+            _path = path;
+            ProfileInfo = profileInfo;
             _root = new FavoriteItem();
             InitFavorites();
 
@@ -35,39 +39,46 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 
         private void InitFavorites()
         {
-            if (!Path.Exists(_path))
+            try
             {
-                Log.Warn($"Failed to find bookmarks file {_path}", typeof(FavoriteProvider));
-                return;
-            }
+                if (!Path.Exists(_path))
+                {
+                    Log.Warn($"Failed to find Bookmarks file: {_path}", typeof(FavoriteProvider));
+                    return;
+                }
 
-            using var fs = new FileStream(_path, FileMode.Open, FileAccess.Read);
-            using var sr = new StreamReader(fs);
-            string json = sr.ReadToEnd();
-            var parsed = JsonDocument.Parse(json);
-            parsed.RootElement.TryGetProperty("roots", out var rootElement);
-            if (rootElement.ValueKind != JsonValueKind.Object)
+                using var fs = new FileStream(_path, FileMode.Open, FileAccess.Read);
+                using var sr = new StreamReader(fs);
+                string json = sr.ReadToEnd();
+                var parsed = JsonDocument.Parse(json);
+                parsed.RootElement.TryGetProperty("roots", out var rootElement);
+                if (rootElement.ValueKind != JsonValueKind.Object)
+                {
+                    return;
+                }
+
+                var newRoot = new FavoriteItem();
+                rootElement.TryGetProperty("bookmark_bar", out var bookmarkBarElement);
+                if (bookmarkBarElement.ValueKind == JsonValueKind.Object)
+                {
+                    ProcessFavorites(bookmarkBarElement, newRoot, string.Empty, true);
+                }
+
+                rootElement.TryGetProperty("other", out var otherElement);
+                if (otherElement.ValueKind == JsonValueKind.Object)
+                {
+                    ProcessFavorites(otherElement, newRoot, string.Empty, newRoot.Childrens.Count == 0);
+                }
+
+                _root = newRoot;
+            }
+            catch (Exception ex)
             {
-                return;
+                Log.Exception($"Failed to read favorites: {_path}", ex, typeof(FavoriteProvider));
             }
-
-            var newRoot = new FavoriteItem();
-            rootElement.TryGetProperty("bookmark_bar", out var bookmarkBarElement);
-            if (bookmarkBarElement.ValueKind == JsonValueKind.Object)
-            {
-                ProcessFavorites(bookmarkBarElement, newRoot, string.Empty, true);
-            }
-
-            rootElement.TryGetProperty("other", out var otherElement);
-            if (otherElement.ValueKind == JsonValueKind.Object)
-            {
-                ProcessFavorites(otherElement, newRoot, string.Empty, newRoot.Childrens.Count == 0);
-            }
-
-            _root = newRoot;
         }
 
-        private static void ProcessFavorites(JsonElement element, FavoriteItem parent, string path, bool root)
+        private void ProcessFavorites(JsonElement element, FavoriteItem parent, string path, bool root)
         {
             if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("children", out var children))
             {
@@ -79,7 +90,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                         path += $"{(string.IsNullOrWhiteSpace(path) ? string.Empty : "/")}{name}";
                     }
 
-                    var folder = new FavoriteItem(name, null, path, FavoriteType.Folder);
+                    var folder = new FavoriteItem(name, path);
 
                     if (root)
                     {
@@ -105,7 +116,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                 if (!string.IsNullOrWhiteSpace(name))
                 {
                     path += $"{(string.IsNullOrWhiteSpace(path) ? string.Empty : "/")}{name}";
-                    var favorite = new FavoriteItem(name, url.GetString(), path, FavoriteType.Url);
+                    var favorite = new FavoriteItem(name, url.GetString(), path, ProfileInfo);
                     parent.AddChildren(favorite);
                 }
             }

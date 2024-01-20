@@ -19,11 +19,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         public static string PluginID => "D73A7EF0633F4C82A14454FFD848F447";
 
         private const string SearchTree = nameof(SearchTree);
+        private const string DefaultOnly = nameof(DefaultOnly);
         private const bool SearchTreeDefault = false;
-        private readonly IFavoriteProvider _favoriteProvider;
-        private readonly IFavoriteQuery _favoriteQuery;
+        private const bool DefaultOnlyDefault = false;
+        private readonly ProfileManager _profileManager;
+        private readonly FavoriteQuery _favoriteQuery;
         private PluginInitContext? _context;
         private bool _searchTree;
+        private bool _defaultOnly;
 
         public string Name => "Edge Favorite";
 
@@ -31,19 +34,26 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public IEnumerable<PluginAdditionalOption> AdditionalOptions => new List<PluginAdditionalOption>
         {
-            new PluginAdditionalOption
+            new()
             {
                 Key = SearchTree,
                 Value = SearchTreeDefault,
                 DisplayLabel = "Search as tree",
-                DisplayDescription = "Navigate the original directory tree when searching.",
+                DisplayDescription = "Navigate the folder tree when searching.",
+            },
+            new()
+            {
+                Key = DefaultOnly,
+                Value = DefaultOnlyDefault,
+                DisplayLabel = "Default profile only",
+                DisplayDescription = "Show favorites only from the default Microsoft Edge profile.",
             },
         };
 
         public Main()
         {
-            _favoriteProvider = new FavoriteProvider();
-            _favoriteQuery = new FavoriteQuery();
+            _profileManager = new ProfileManager(_defaultOnly);
+            _favoriteQuery = new FavoriteQuery(_profileManager);
         }
 
         public void Init(PluginInitContext context)
@@ -55,27 +65,27 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public List<Result> Query(Query query)
         {
-            var search = query.Search.Replace('\\', '/').Split('/');
+            var showProfileName = _profileManager.FavoriteProviders.Count > 1;
 
             if (_searchTree)
             {
                 return _favoriteQuery
-                    .Search(_favoriteProvider.Root, search, 0)
+                    .Search(query.Search)
                     .OrderBy(f => f.Type)
                     .ThenBy(f => f.Name)
-                    .Select(f => f.CreateResult())
+                    .Select(f => f.CreateResult(showProfileName))
                     .ToList();
             }
             else
             {
                 var results = new List<Result>();
 
-                foreach (var favorite in _favoriteQuery.GetAll(_favoriteProvider.Root))
+                foreach (var favorite in _favoriteQuery.GetAll())
                 {
                     var score = StringMatcher.FuzzySearch(query.Search, favorite.Name);
                     if (string.IsNullOrWhiteSpace(query.Search) || score.Score > 0)
                     {
-                        var result = favorite.CreateResult();
+                        var result = favorite.CreateResult(showProfileName);
                         result.Score = score.Score;
                         result.TitleHighlightData = score.MatchData;
                         results.Add(result);
@@ -93,13 +103,22 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public void UpdateSettings(PowerLauncherPluginSettings settings)
         {
+            var oldDefaultOnly = _defaultOnly;
+
             if (settings != null && settings.AdditionalOptions != null)
             {
                 _searchTree = settings.AdditionalOptions.FirstOrDefault(x => x.Key == SearchTree)?.Value ?? SearchTreeDefault;
+                _defaultOnly = settings.AdditionalOptions.FirstOrDefault(x => x.Key == DefaultOnly)?.Value ?? DefaultOnlyDefault;
             }
             else
             {
                 _searchTree = SearchTreeDefault;
+                _defaultOnly = DefaultOnlyDefault;
+            }
+
+            if (oldDefaultOnly != _defaultOnly)
+            {
+                _profileManager.ReloadProfiles(_defaultOnly);
             }
         }
 
@@ -107,7 +126,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         {
             if (selectedResult.ContextData is not FavoriteItem favorite)
             {
-                return new List<ContextMenuResult>();
+                return new();
             }
 
             return favorite.CreateContextMenuResult();
