@@ -22,6 +22,6 @@ Simple [PowerToys Run](https://learn.microsoft.com/windows/powertoys/run) experi
 
 ## Screenshots
 
-![Plugin Manager](/images/PluginManager.png)
+![Search](./images/Search.png)
 
-![Plugin Manager](/images/Search.png)
+![Plugin Manager](./images/PluginManager.png)
