@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Davide Giacometti. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
+using System.Collections.ObjectModel;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 {
-    public interface IFavoriteQuery
+    public interface IProfileManager
     {
-        IEnumerable<FavoriteItem> GetAll();
+        ReadOnlyCollection<IFavoriteProvider> FavoriteProviders { get; }
 
-        IEnumerable<FavoriteItem> Search(string query);
+        void ReloadProfiles(bool all);
     }
 }

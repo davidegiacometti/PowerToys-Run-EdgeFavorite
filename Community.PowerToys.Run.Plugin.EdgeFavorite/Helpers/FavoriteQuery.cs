@@ -10,7 +10,47 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 {
     public class FavoriteQuery : IFavoriteQuery
     {
-        public IEnumerable<FavoriteItem> GetAll(FavoriteItem node)
+        private readonly IProfileManager _profileManager;
+
+        public FavoriteQuery(IProfileManager profileManager)
+        {
+            _profileManager = profileManager;
+        }
+
+        public IEnumerable<FavoriteItem> GetAll()
+        {
+            foreach (var root in _profileManager.FavoriteProviders.Select(p => p.Root))
+            {
+                foreach (var favorite in GetAll(root))
+                {
+                    yield return favorite;
+                }
+            }
+        }
+
+        public IEnumerable<FavoriteItem> Search(string query)
+        {
+            var path = query.Replace('\\', '/').Split('/');
+
+            if (_profileManager.FavoriteProviders.Count == 1)
+            {
+                return Search(_profileManager.FavoriteProviders[0].Root, path, 0);
+            }
+            else
+            {
+                var results = new List<FavoriteItem>();
+
+                foreach (var root in _profileManager.FavoriteProviders.Select(p => p.Root))
+                {
+                    results.AddRange(Search(root, path, 0));
+                }
+
+                // Flatten folders with same path for each profiles
+                return results.DistinctBy(f => new { f.Path, f.Type, f.Profile });
+            }
+        }
+
+        private static IEnumerable<FavoriteItem> GetAll(FavoriteItem node)
         {
             if (node.Type == FavoriteType.Url)
             {
@@ -28,7 +68,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
             }
         }
 
-        public IEnumerable<FavoriteItem> Search(FavoriteItem node, string[] path, int depth)
+        private static IEnumerable<FavoriteItem> Search(FavoriteItem node, string[] path, int depth)
         {
             if (depth == path.Length - 1)
             {

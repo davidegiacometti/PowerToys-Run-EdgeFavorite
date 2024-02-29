@@ -7,8 +7,8 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers;
 using ManagedCommon;
-using Wox.Infrastructure;
 using Wox.Plugin;
 using Wox.Plugin.Logger;
 
@@ -16,6 +16,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 {
     public class FavoriteItem
     {
+        private static readonly ProfileInfo _emptyProfile = new(string.Empty, string.Empty);
         private static readonly string _pluginName = Assembly.GetExecutingAssembly().GetName().Name ?? string.Empty;
         private static string? _folderIcoPath;
         private static string? _urlIcoPath;
@@ -29,6 +30,8 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 
         public FavoriteType Type { get; }
 
+        public ProfileInfo Profile { get; }
+
         public ReadOnlyCollection<FavoriteItem> Childrens => _childrens.AsReadOnly();
 
         public FavoriteItem()
@@ -36,14 +39,24 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             Name = string.Empty;
             Path = string.Empty;
             Type = FavoriteType.Folder;
+            Profile = _emptyProfile; // Folders are profile agnostic
         }
 
-        public FavoriteItem(string name, string? url, string path, FavoriteType type)
+        public FavoriteItem(string name, string path)
+        {
+            Name = name;
+            Path = path;
+            Type = FavoriteType.Folder;
+            Profile = _emptyProfile; // Folders are profile agnostic
+        }
+
+        public FavoriteItem(string name, string? url, string path, ProfileInfo profile)
         {
             Name = name;
             Url = url;
             Path = path;
-            Type = type;
+            Type = FavoriteType.Url;
+            Profile = profile;
         }
 
         public void AddChildren(FavoriteItem item)
@@ -51,7 +64,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             _childrens.Add(item);
         }
 
-        public Result CreateResult()
+        public Result CreateResult(bool showProfileName)
         {
             return Type switch
             {
@@ -66,12 +79,12 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                 FavoriteType.Url => new Result
                 {
                     Title = Name,
-                    SubTitle = $"Favorite: {Path}",
+                    SubTitle = showProfileName ? $"Favorite: {Path} - {Profile.Name}" : $"Favorite: {Path}",
                     IcoPath = _urlIcoPath,
                     QueryTextDisplay = Path,
                     Action = _ =>
                     {
-                        Helper.OpenInShell($"microsoft-edge:{Url}");
+                        EdgeHelpers.OpenInEdge(this, false);
                         return true;
                     },
                     ToolTipData = new ToolTipData(Name, Url),
@@ -85,9 +98,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
         {
             if (Type == FavoriteType.Url)
             {
-                return new List<ContextMenuResult>
+                return new()
                 {
-                    new ContextMenuResult
+                    new()
                     {
                         Title = "Copy URL (Ctrl+C)",
                         Glyph = "\xE8C8",
@@ -109,7 +122,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                             return true;
                         },
                     },
-                    new ContextMenuResult
+                    new()
                     {
                         Title = "Open InPrivate (Ctrl+P)",
                         Glyph = "\xE727",
@@ -119,22 +132,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         PluginName = _pluginName,
                         Action = _ =>
                         {
-                            try
-                            {
-                                Helper.OpenInShell(@"shell:AppsFolder\Microsoft.MicrosoftEdge.Stable_8wekyb3d8bbwe!App", $"-inprivate {Url}");
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Exception("Failed to launch Microsoft Edge", ex, typeof(FavoriteItem));
-                            }
-
+                            EdgeHelpers.OpenInEdge(this, true);
                             return true;
                         },
                     },
                 };
             }
 
-            return new List<ContextMenuResult>();
+            return new();
         }
 
         public static void SetIcons(Theme theme)
