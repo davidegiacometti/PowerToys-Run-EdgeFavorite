@@ -15,10 +15,18 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <Reference Include="..\Community.PowerToys.Run.Plugin.EdgeFavorite\Libs\x64\Wox.Plugin.dll" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Platform)' == 'ARM64'">
+    <Reference Include="..\Community.PowerToys.Run.Plugin.EdgeFavorite\Libs\ARM64\Wox.Plugin.dll" />
+  </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.2.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.2.2" />
+    <PackageReference Include="System.IO.Abstractions" Version="17.2.3" />
   </ItemGroup>
 
   <ItemGroup>

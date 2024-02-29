@@ -1,4 +1,4 @@
-﻿// Copyright (c) Davide Giacometti. All rights reserved.
+// Copyright (c) Davide Giacometti. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -52,7 +52,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public Main()
         {
-            _profileManager = new ProfileManager(_defaultOnly);
+            _profileManager = new ProfileManager();
             _favoriteQuery = new FavoriteQuery(_profileManager);
         }
 
@@ -61,6 +61,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _context.API.ThemeChanged += OnThemeChanged;
             UpdateIconsPath(_context.API.GetCurrentTheme());
+            _profileManager.ReloadProfiles(_searchTree);
         }
 
         public List<Result> Query(Query query)
@@ -73,7 +74,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                     .Search(query.Search)
                     .OrderBy(f => f.Type)
                     .ThenBy(f => f.Name)
-                    .Select(f => f.CreateResult(showProfileName))
+                    .Select(f => f.CreateResult(_context!.API, query.ActionKeyword, showProfileName, _searchTree))
                     .ToList();
             }
             else
@@ -85,7 +86,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                     var score = StringMatcher.FuzzySearch(query.Search, favorite.Name);
                     if (string.IsNullOrWhiteSpace(query.Search) || score.Score > 0)
                     {
-                        var result = favorite.CreateResult(showProfileName);
+                        var result = favorite.CreateResult(_context!.API, query.ActionKeyword, showProfileName, _searchTree);
                         result.Score = score.Score;
                         result.TitleHighlightData = score.MatchData;
                         results.Add(result);

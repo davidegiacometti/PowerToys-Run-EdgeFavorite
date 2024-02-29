@@ -11,7 +11,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks
     {
         public ReadOnlyCollection<IFavoriteProvider> FavoriteProviders => (new IFavoriteProvider[] { new DefaultFavoriteProvider(), new WorkFavoriteProvider() }).AsReadOnly();
 
-        public void ReloadProfiles(bool all)
+        public void ReloadProfiles(bool defaultOnly)
         {
         }
     }

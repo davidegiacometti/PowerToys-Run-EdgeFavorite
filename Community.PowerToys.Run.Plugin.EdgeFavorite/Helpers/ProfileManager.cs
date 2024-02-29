@@ -19,9 +19,8 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 
         public ReadOnlyCollection<IFavoriteProvider> FavoriteProviders => _favoriteProviders.AsReadOnly();
 
-        public ProfileManager(bool defaultOnly)
+        public ProfileManager()
         {
-            ReloadProfiles(defaultOnly);
         }
 
         public void ReloadProfiles(bool defaultOnly)

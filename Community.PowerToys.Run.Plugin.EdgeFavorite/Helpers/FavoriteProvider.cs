@@ -1,4 +1,4 @@
-﻿// Copyright (c) Davide Giacometti. All rights reserved.
+// Copyright (c) Davide Giacometti. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -110,13 +110,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                     }
                 }
             }
-            else if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("url", out var url))
+            else if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("url", out var urlProperty))
             {
                 var name = element.GetProperty("name").GetString();
-                if (!string.IsNullOrWhiteSpace(name))
+                var url = urlProperty.GetString();
+                if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(url))
                 {
                     path += $"{(string.IsNullOrWhiteSpace(path) ? string.Empty : "/")}{name}";
-                    var favorite = new FavoriteItem(name, url.GetString(), path, ProfileInfo);
+                    var favorite = new FavoriteItem(name, url, path, ProfileInfo);
                     parent.AddChildren(favorite);
                 }
             }

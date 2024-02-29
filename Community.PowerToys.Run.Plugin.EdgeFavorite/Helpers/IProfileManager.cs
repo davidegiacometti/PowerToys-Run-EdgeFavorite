@@ -9,6 +9,6 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
     {
         ReadOnlyCollection<IFavoriteProvider> FavoriteProviders { get; }
 
-        void ReloadProfiles(bool all);
+        void ReloadProfiles(bool defaultOnly);
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Davide Giacometti. All rights reserved.
+// Copyright (c) Davide Giacometti. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -50,7 +50,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             Profile = _emptyProfile; // Folders are profile agnostic
         }
 
-        public FavoriteItem(string name, string? url, string path, ProfileInfo profile)
+        public FavoriteItem(string name, string url, string path, ProfileInfo profile)
         {
             Name = name;
             Url = url;
@@ -64,7 +64,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             _childrens.Add(item);
         }
 
-        public Result CreateResult(bool showProfileName)
+        public Result CreateResult(IPublicAPI api, string actionKeyword, bool showProfileName, bool searchTree)
         {
             return Type switch
             {
@@ -73,15 +73,24 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     Title = Name,
                     SubTitle = $"Folder: {Path}",
                     IcoPath = _folderIcoPath,
-                    QueryTextDisplay = Path,
+                    QueryTextDisplay = $"{Path}/",
                     ContextData = this,
+                    Action = _ =>
+                    {
+                        var newQuery = string.IsNullOrWhiteSpace(actionKeyword)
+                            ? $"{Path}/"
+                            : $"{actionKeyword} {Path}/";
+
+                        api.ChangeQuery(newQuery, true);
+                        return false;
+                    },
                 },
                 FavoriteType.Url => new Result
                 {
                     Title = Name,
                     SubTitle = showProfileName ? $"Favorite: {Path} - {Profile.Name}" : $"Favorite: {Path}",
                     IcoPath = _urlIcoPath,
-                    QueryTextDisplay = Path,
+                    QueryTextDisplay = searchTree ? Path : Name,
                     Action = _ =>
                     {
                         EdgeHelpers.OpenInEdge(this, false);
