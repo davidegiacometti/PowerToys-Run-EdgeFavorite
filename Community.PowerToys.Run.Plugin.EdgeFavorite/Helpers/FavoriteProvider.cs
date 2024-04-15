@@ -9,11 +9,12 @@ using Wox.Plugin.Logger;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 {
-    public class FavoriteProvider : IFavoriteProvider
+    public sealed class FavoriteProvider : IFavoriteProvider, IDisposable
     {
         private readonly string _path;
         private readonly FileSystemWatcher _watcher;
         private FavoriteItem _root;
+        private bool _disposed;
 
         public FavoriteItem Root => _root;
 
@@ -35,6 +36,17 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 
             _watcher.Changed += (s, e) => InitFavorites();
             _watcher.EnableRaisingEvents = true;
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _watcher?.Dispose();
+            _disposed = true;
         }
 
         private void InitFavorites()
@@ -103,7 +115,8 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 
                     if (children.ValueKind == JsonValueKind.Array)
                     {
-                        foreach (var child in children.EnumerateArray())
+                        using var childEnumerator = children.EnumerateArray();
+                        foreach (var child in childEnumerator)
                         {
                             ProcessFavorites(child, folder, path, false);
                         }

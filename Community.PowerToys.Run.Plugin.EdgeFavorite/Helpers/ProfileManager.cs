@@ -12,21 +12,19 @@ using Wox.Plugin.Logger;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 {
-    public class ProfileManager : IProfileManager
+    public sealed class ProfileManager : IProfileManager, IDisposable
     {
         private static readonly string _userDataPath = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\Microsoft\Edge\User Data");
         private readonly List<IFavoriteProvider> _favoriteProviders = new();
+        private bool _disposed;
 
         public ReadOnlyCollection<IFavoriteProvider> FavoriteProviders => _favoriteProviders.AsReadOnly();
-
-        public ProfileManager()
-        {
-        }
 
         public void ReloadProfiles(bool defaultOnly)
         {
             if (_favoriteProviders.Count > 0)
             {
+                DisposeFavoriteProviders();
                 _favoriteProviders.Clear();
             }
 
@@ -54,6 +52,17 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                 TrySetProfileName(profile, directory.FullName);
                 _favoriteProviders.Add(new FavoriteProvider(path, profile));
             }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            DisposeFavoriteProviders();
+            _disposed = true;
         }
 
         private static void TrySetProfileName(ProfileInfo profileInfo, string directoryPath)
@@ -95,6 +104,17 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                     Log.Exception("Failed to set profile name", ex, typeof(ProfileManager));
                 }
             });
+        }
+
+        private void DisposeFavoriteProviders()
+        {
+            foreach (var privider in _favoriteProviders)
+            {
+                if (privider is IDisposable disposableProvider)
+                {
+                    disposableProvider.Dispose();
+                }
+            }
         }
     }
 }

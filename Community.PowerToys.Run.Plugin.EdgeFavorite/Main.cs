@@ -14,7 +14,7 @@ using Wox.Plugin;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 {
-    public class Main : IPlugin, ISettingProvider, IContextMenu
+    public sealed class Main : IPlugin, ISettingProvider, IContextMenu, IDisposable
     {
         public static string PluginID => "D73A7EF0633F4C82A14454FFD848F447";
 
@@ -27,10 +27,11 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         private PluginInitContext? _context;
         private bool _searchTree;
         private bool _defaultOnly;
+        private bool _disposed;
 
         public string Name => "Edge Favorite";
 
-        public string Description => "Open Microsoft Edge favorites.";
+        public string Description => "Opens Microsoft Edge favorites";
 
         public IEnumerable<PluginAdditionalOption> AdditionalOptions => new List<PluginAdditionalOption>
         {
@@ -131,6 +132,17 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             }
 
             return favorite.CreateContextMenuResult();
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _profileManager?.Dispose();
+            _disposed = true;
         }
 
         private void OnThemeChanged(Theme currentTheme, Theme newTheme)
