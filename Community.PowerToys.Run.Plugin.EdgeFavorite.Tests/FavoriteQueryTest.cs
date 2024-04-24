@@ -28,17 +28,17 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         }
 
         [TestMethod]
-        public void Should_Get_All_Urls()
+        public void Should_Get_All_Favorites()
         {
             var result = _singleFavoriteQuery.GetAll();
-            Assert.AreEqual(result.Count(), 10);
+            Assert.AreEqual(result.Count(), 13);
         }
 
         [TestMethod]
-        public void Should_Get_All_Urls_From_All_Profiles()
+        public void Should_Get_All_Favorites_From_All_Profiles()
         {
             var result = _multiFavoriteQuery.GetAll();
-            Assert.AreEqual(result.Count(), 14);
+            Assert.AreEqual(result.Count(), 18);
         }
 
         [DataTestMethod]
@@ -60,10 +60,10 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         }
 
         [TestMethod]
-        public void Should_Get_Single_Folder()
+        public void Should_Get_Folder_Twice()
         {
             var result = _multiFavoriteQuery.Search("Codi");
-            Assert.AreEqual(result.Count(), 1);
+            Assert.AreEqual(result.Count(), 2);
         }
 
         [TestMethod]

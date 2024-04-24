@@ -24,7 +24,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
         {
             _path = path;
             ProfileInfo = profileInfo;
-            _root = new FavoriteItem();
+            _root = new FavoriteItem(profileInfo);
             InitFavorites();
 
             _watcher = new FileSystemWatcher
@@ -69,7 +69,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                     return;
                 }
 
-                var newRoot = new FavoriteItem();
+                var newRoot = new FavoriteItem(ProfileInfo);
                 rootElement.TryGetProperty("bookmark_bar", out var bookmarkBarElement);
                 if (bookmarkBarElement.ValueKind == JsonValueKind.Object)
                 {
@@ -79,7 +79,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                 rootElement.TryGetProperty("other", out var otherElement);
                 if (otherElement.ValueKind == JsonValueKind.Object)
                 {
-                    ProcessFavorites(otherElement, newRoot, string.Empty, newRoot.Childrens.Count == 0);
+                    ProcessFavorites(otherElement, newRoot, string.Empty, newRoot.Children.Count == 0);
                 }
 
                 _root = newRoot;
@@ -102,7 +102,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                         path += $"{(string.IsNullOrWhiteSpace(path) ? string.Empty : "/")}{name}";
                     }
 
-                    var folder = new FavoriteItem(name, path);
+                    var folder = new FavoriteItem(name, path, ProfileInfo);
 
                     if (root)
                     {

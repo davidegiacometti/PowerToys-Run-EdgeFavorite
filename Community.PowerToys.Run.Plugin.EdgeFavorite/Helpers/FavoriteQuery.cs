@@ -1,4 +1,4 @@
-﻿// Copyright (c) Davide Giacometti. All rights reserved.
+// Copyright (c) Davide Giacometti. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -21,7 +21,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
         {
             foreach (var root in _profileManager.FavoriteProviders.Select(p => p.Root))
             {
-                foreach (var favorite in GetAll(root))
+                foreach (var favorite in GetAll(root, false))
                 {
                     yield return favorite;
                 }
@@ -45,12 +45,11 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                     results.AddRange(Search(root, path, 0));
                 }
 
-                // Flatten folders with same path for each profiles
-                return results.DistinctBy(f => new { f.Path, f.Type, f.Profile });
+                return results;
             }
         }
 
-        private static IEnumerable<FavoriteItem> GetAll(FavoriteItem node)
+        private static IEnumerable<FavoriteItem> GetAll(FavoriteItem node, bool isChild)
         {
             if (node.Type == FavoriteType.Url)
             {
@@ -58,9 +57,15 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
             }
             else
             {
-                foreach (var child in node.Childrens)
+                // Skip the root node
+                if (isChild)
                 {
-                    foreach (var item in GetAll(child))
+                    yield return node;
+                }
+
+                foreach (var child in node.Children)
+                {
+                    foreach (var item in GetAll(child, true))
                     {
                         yield return item;
                     }
@@ -72,10 +77,10 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
         {
             if (depth == path.Length - 1)
             {
-                return node.Childrens.Where(f => f.Name != null && f.Name.StartsWith(path[depth], StringComparison.OrdinalIgnoreCase));
+                return node.Children.Where(f => f.Name != null && f.Name.StartsWith(path[depth], StringComparison.OrdinalIgnoreCase));
             }
 
-            var folder = node.Childrens.SingleOrDefault(f => f.Type == FavoriteType.Folder && f.Name != null && f.Name.Equals(path[depth], StringComparison.OrdinalIgnoreCase));
+            var folder = node.Children.SingleOrDefault(f => f.Type == FavoriteType.Folder && f.Name != null && f.Name.Equals(path[depth], StringComparison.OrdinalIgnoreCase));
 
             if (folder != null)
             {

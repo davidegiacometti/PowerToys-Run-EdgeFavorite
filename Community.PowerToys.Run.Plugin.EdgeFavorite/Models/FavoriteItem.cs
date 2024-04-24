@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -16,11 +17,10 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 {
     public class FavoriteItem
     {
-        private static readonly ProfileInfo _emptyProfile = new(string.Empty, string.Empty);
         private static readonly string _pluginName = Assembly.GetExecutingAssembly().GetName().Name ?? string.Empty;
         private static string? _folderIcoPath;
         private static string? _urlIcoPath;
-        private readonly List<FavoriteItem> _childrens = new();
+        private readonly List<FavoriteItem> _children = new();
 
         public string Name { get; }
 
@@ -32,22 +32,22 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 
         public ProfileInfo Profile { get; }
 
-        public ReadOnlyCollection<FavoriteItem> Childrens => _childrens.AsReadOnly();
+        public ReadOnlyCollection<FavoriteItem> Children => _children.AsReadOnly();
 
-        public FavoriteItem()
+        public FavoriteItem(ProfileInfo profile)
         {
             Name = string.Empty;
             Path = string.Empty;
             Type = FavoriteType.Folder;
-            Profile = _emptyProfile; // Folders are profile agnostic
+            Profile = profile;
         }
 
-        public FavoriteItem(string name, string path)
+        public FavoriteItem(string name, string path, ProfileInfo profile)
         {
             Name = name;
             Path = path;
             Type = FavoriteType.Folder;
-            Profile = _emptyProfile; // Folders are profile agnostic
+            Profile = profile;
         }
 
         public FavoriteItem(string name, string url, string path, ProfileInfo profile)
@@ -61,21 +61,25 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 
         public void AddChildren(FavoriteItem item)
         {
-            _childrens.Add(item);
+            _children.Add(item);
         }
 
         public Result CreateResult(IPublicAPI api, string actionKeyword, bool showProfileName, bool searchTree)
         {
-            return Type switch
+            if (Type == FavoriteType.Folder)
             {
-                FavoriteType.Folder => new Result
+                var result = new Result
                 {
                     Title = Name,
-                    SubTitle = $"Folder: {Path}",
+                    SubTitle = showProfileName ? $"Folder: {Path} - {Profile.Name}" : $"Folder: {Path}",
                     IcoPath = _folderIcoPath,
                     QueryTextDisplay = $"{Path}/",
                     ContextData = this,
-                    Action = _ =>
+                };
+
+                if (searchTree)
+                {
+                    result.Action = _ =>
                     {
                         var newQuery = string.IsNullOrWhiteSpace(actionKeyword)
                             ? $"{Path}/"
@@ -83,9 +87,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 
                         api.ChangeQuery(newQuery, true);
                         return false;
-                    },
-                },
-                FavoriteType.Url => new Result
+                    };
+                }
+
+                return result;
+            }
+            else if (Type == FavoriteType.Url)
+            {
+                return new Result
                 {
                     Title = Name,
                     SubTitle = showProfileName ? $"Favorite: {Path} - {Profile.Name}" : $"Favorite: {Path}",
@@ -98,14 +107,49 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     },
                     ToolTipData = new ToolTipData(Name, Url),
                     ContextData = this,
-                },
-                _ => throw new ArgumentException(),
-            };
+                };
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         public List<ContextMenuResult> CreateContextMenuResult()
         {
-            if (Type == FavoriteType.Url)
+            if (Type == FavoriteType.Folder)
+            {
+                var childFavorites = Children.Where(c => c.Type == FavoriteType.Url).ToArray();
+                var childFavoritesCount = childFavorites.Length;
+
+                if (childFavoritesCount > 0)
+                {
+                    return new()
+                    {
+                        new()
+                        {
+                            Title = $"Open all ({childFavoritesCount}) (Ctrl+O)",
+                            Glyph = "\xE8A7",
+                            FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
+                            AcceleratorKey = Key.O,
+                            AcceleratorModifiers = ModifierKeys.Control,
+                            PluginName = _pluginName,
+                            Action = _ => OpenAll(childFavorites, false),
+                        },
+                        new()
+                        {
+                            Title = $"Open all ({childFavoritesCount}) in InPrivate (Ctrl+P)",
+                            Glyph = "\xE727",
+                            FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
+                            AcceleratorKey = Key.P,
+                            AcceleratorModifiers = ModifierKeys.Control,
+                            PluginName = _pluginName,
+                            Action = _ => OpenAll(childFavorites, true),
+                        },
+                    };
+                }
+            }
+            else if (Type == FavoriteType.Url)
             {
                 return new()
                 {
@@ -133,7 +177,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     },
                     new()
                     {
-                        Title = "Open InPrivate (Ctrl+P)",
+                        Title = "Open in InPrivate (Ctrl+P)",
                         Glyph = "\xE727",
                         FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.P,
@@ -163,6 +207,16 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                 _folderIcoPath = "Images/Folder.dark.png";
                 _urlIcoPath = "Images/Url.dark.png";
             }
+        }
+
+        private static bool OpenAll(IEnumerable<FavoriteItem> favorites, bool inPrivate)
+        {
+            foreach (var favorite in favorites)
+            {
+                EdgeHelpers.OpenInEdge(favorite, inPrivate);
+            }
+
+            return true;
         }
     }
 }
