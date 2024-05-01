@@ -40,12 +40,11 @@ jobs:
 
       - name: Prepare artifact
         run: |
-          Remove-Item -Path Community.PowerToys.Run.Plugin.EdgeFavorite\bin\* -Recurse -Include *.xml, *.pdb, PowerToys.*, Wox.*
-          Rename-Item -Path Community.PowerToys.Run.Plugin.EdgeFavorite\bin\${{matrix.platform}}\Release -NewName $env:PLUGIN_NAME
-          Compress-Archive -Path Community.PowerToys.Run.Plugin.EdgeFavorite\bin\${{matrix.platform}}\$env:PLUGIN_NAME -DestinationPath "${{env.PLUGIN_NAME}}-${{env.PLUGIN_VERSION}}-${{matrix.platform}}.zip"
+          Remove-Item -Path Community.PowerToys.Run.Plugin.EdgeFavorite/bin/* -Recurse -Include *.xml, *.pdb, PowerToys.*, Wox.*
+          Rename-Item -Path Community.PowerToys.Run.Plugin.EdgeFavorite/bin/${{matrix.platform}}/Release -NewName $env:PLUGIN_NAME
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{env.PLUGIN_NAME}}-${{env.PLUGIN_VERSION}}
-          path: "**/*.zip"
+          name: ${{env.PLUGIN_NAME}}-${{env.PLUGIN_VERSION}}-${{matrix.platform}}
+          path: Community.PowerToys.Run.Plugin.EdgeFavorite/bin/${{matrix.platform}}/*
