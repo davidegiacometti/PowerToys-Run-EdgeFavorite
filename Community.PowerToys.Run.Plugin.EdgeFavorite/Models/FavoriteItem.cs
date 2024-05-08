@@ -102,7 +102,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     QueryTextDisplay = searchTree ? Path : Name,
                     Action = _ =>
                     {
-                        EdgeHelpers.OpenInEdge(this, false);
+                        EdgeHelpers.OpenInEdge(this, false, false);
                         return true;
                     },
                     ToolTipData = new ToolTipData(Name, Url),
@@ -129,22 +129,32 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         new()
                         {
                             Title = $"Open all ({childFavoritesCount}) (Ctrl+O)",
-                            Glyph = "\xE8A7",
+                            Glyph = "\xE737",
                             FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                             AcceleratorKey = Key.O,
                             AcceleratorModifiers = ModifierKeys.Control,
                             PluginName = _pluginName,
-                            Action = _ => OpenAll(childFavorites, false),
+                            Action = _ => OpenAll(childFavorites, false, false),
                         },
                         new()
                         {
-                            Title = $"Open all ({childFavoritesCount}) in InPrivate (Ctrl+P)",
+                            Title = $"Open all ({childFavoritesCount}) in new window (Ctrl+N)",
+                            Glyph = "\xE8A7",
+                            FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
+                            AcceleratorKey = Key.N,
+                            AcceleratorModifiers = ModifierKeys.Control,
+                            PluginName = _pluginName,
+                            Action = _ => OpenAll(childFavorites, false, true),
+                        },
+                        new()
+                        {
+                            Title = $"Open all ({childFavoritesCount}) in InPrivate window (Ctrl+P)",
                             Glyph = "\xE727",
                             FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                             AcceleratorKey = Key.P,
                             AcceleratorModifiers = ModifierKeys.Control,
                             PluginName = _pluginName,
-                            Action = _ => OpenAll(childFavorites, true),
+                            Action = _ => OpenAll(childFavorites, true, false),
                         },
                     };
                 }
@@ -177,7 +187,21 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     },
                     new()
                     {
-                        Title = "Open in InPrivate (Ctrl+P)",
+                        Title = "Open in new window (Ctrl+N)",
+                        Glyph = "\xE8A7",
+                        FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
+                        AcceleratorKey = Key.N,
+                        AcceleratorModifiers = ModifierKeys.Control,
+                        PluginName = _pluginName,
+                        Action = _ =>
+                        {
+                            EdgeHelpers.OpenInEdge(this, false, true);
+                            return true;
+                        },
+                    },
+                    new()
+                    {
+                        Title = "Open in InPrivate window (Ctrl+P)",
                         Glyph = "\xE727",
                         FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.P,
@@ -185,7 +209,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         PluginName = _pluginName,
                         Action = _ =>
                         {
-                            EdgeHelpers.OpenInEdge(this, true);
+                            EdgeHelpers.OpenInEdge(this, true, false);
                             return true;
                         },
                     },
@@ -209,11 +233,24 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             }
         }
 
-        private static bool OpenAll(IEnumerable<FavoriteItem> favorites, bool inPrivate)
+        private static bool OpenAll(FavoriteItem[] favorites, bool inPrivate, bool newWindow)
         {
-            foreach (var favorite in favorites)
+            if (favorites.Length == 0)
             {
-                EdgeHelpers.OpenInEdge(favorite, inPrivate);
+                throw new InvalidOperationException("Favorites cannot be empty.");
+            }
+
+            // If there is no need to open in a new window, starting multiple processes is preferred to avoid long command line arguments
+            if (newWindow)
+            {
+                EdgeHelpers.OpenInEdge(favorites[0].Profile, string.Join(" ", favorites.Select(f => f.Url!)), inPrivate, newWindow);
+            }
+            else
+            {
+                foreach (var favorite in favorites)
+                {
+                    EdgeHelpers.OpenInEdge(favorite, inPrivate, false);
+                }
             }
 
             return true;
