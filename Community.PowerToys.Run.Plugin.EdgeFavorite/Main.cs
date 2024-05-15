@@ -62,7 +62,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _context.API.ThemeChanged += OnThemeChanged;
             UpdateIconsPath(_context.API.GetCurrentTheme());
-            _profileManager.ReloadProfiles(_searchTree);
+            _profileManager.ReloadProfiles(_defaultOnly);
         }
 
         public List<Result> Query(Query query)
