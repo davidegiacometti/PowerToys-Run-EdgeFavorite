@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
 using Wox.Plugin.Logger;
 
@@ -20,7 +20,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 
         public ReadOnlyCollection<IFavoriteProvider> FavoriteProviders => _favoriteProviders.AsReadOnly();
 
-        public void ReloadProfiles(bool defaultOnly)
+        public void ReloadProfiles(IEnumerable<string> excluded)
         {
             if (_favoriteProviders.Count > 0)
             {
@@ -43,13 +43,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                     continue;
                 }
 
-                if (defaultOnly && !directory.Name.Equals("Default", StringComparison.OrdinalIgnoreCase))
+                var name = GetProfileName(directory.FullName) ?? directory.Name;
+
+                if (excluded.Any(e => e.Equals(name, StringComparison.OrdinalIgnoreCase)))
                 {
                     continue;
                 }
 
-                var profile = new ProfileInfo(directory.Name, directory.Name);
-                TrySetProfileName(profile, directory.FullName);
+                var profile = new ProfileInfo(name, directory.Name);
                 _favoriteProviders.Add(new FavoriteProvider(path, profile));
             }
         }
@@ -65,45 +66,43 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
             _disposed = true;
         }
 
-        private static void TrySetProfileName(ProfileInfo profileInfo, string directoryPath)
+        private static string? GetProfileName(string directoryPath)
         {
-            _ = Task.Run(() =>
+            try
             {
-                try
+                var preferencesPath = Path.Combine(directoryPath, "Preferences");
+                if (!File.Exists(preferencesPath))
                 {
-                    var preferencesPath = Path.Combine(directoryPath, "Preferences");
-                    if (!File.Exists(preferencesPath))
-                    {
-                        Log.Error($"Failed to set profile name: {preferencesPath} files not found.", typeof(ProfileManager));
-                        return;
-                    }
-
-                    using var fs = new FileStream(preferencesPath, FileMode.Open, FileAccess.Read);
-                    using var sr = new StreamReader(fs);
-                    string json = sr.ReadToEnd();
-                    var parsed = JsonDocument.Parse(json);
-                    parsed.RootElement.TryGetProperty("profile", out var profileElement);
-                    profileElement.TryGetProperty("name", out var nameElement);
-                    if (nameElement.ValueKind != JsonValueKind.String)
-                    {
-                        Log.Error("Failed to set profile name: name property is not a string.", typeof(ProfileManager));
-                        return;
-                    }
-
-                    var name = nameElement.GetString();
-                    if (string.IsNullOrWhiteSpace(name))
-                    {
-                        Log.Error("Failed to set profile name: name property is empty.", typeof(ProfileManager));
-                        return;
-                    }
-
-                    profileInfo.Name = name;
+                    Log.Error($"Failed to read profile name: {preferencesPath} files not found.", typeof(ProfileManager));
+                    return null;
                 }
-                catch (Exception ex)
+
+                using var fs = new FileStream(preferencesPath, FileMode.Open, FileAccess.Read);
+                using var sr = new StreamReader(fs);
+                string json = sr.ReadToEnd();
+                var parsed = JsonDocument.Parse(json);
+                parsed.RootElement.TryGetProperty("profile", out var profileElement);
+                profileElement.TryGetProperty("name", out var nameElement);
+                if (nameElement.ValueKind != JsonValueKind.String)
                 {
-                    Log.Exception("Failed to set profile name", ex, typeof(ProfileManager));
+                    Log.Error("Failed to read profile name: name property is not a string.", typeof(ProfileManager));
+                    return null;
                 }
-            });
+
+                var name = nameElement.GetString();
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    Log.Error("Failed to read profile name: name property is empty.", typeof(ProfileManager));
+                    return null;
+                }
+
+                return name;
+            }
+            catch (Exception ex)
+            {
+                Log.Exception("Failed to read profile name", ex, typeof(ProfileManager));
+                return null;
+            }
         }
 
         private void DisposeFavoriteProviders()

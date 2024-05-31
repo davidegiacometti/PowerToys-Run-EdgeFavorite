@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers;
@@ -19,14 +20,13 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         public static string PluginID => "D73A7EF0633F4C82A14454FFD848F447";
 
         private const string SearchTree = nameof(SearchTree);
-        private const string DefaultOnly = nameof(DefaultOnly);
+        private const string ExcludedProfiles = nameof(ExcludedProfiles);
         private const bool SearchTreeDefault = false;
-        private const bool DefaultOnlyDefault = false;
         private readonly ProfileManager _profileManager;
         private readonly FavoriteQuery _favoriteQuery;
         private PluginInitContext? _context;
         private bool _searchTree;
-        private bool _defaultOnly;
+        private ReadOnlyCollection<string> _excludedProfiles = ReadOnlyCollection<string>.Empty;
         private bool _disposed;
 
         public string Name => "Edge Favorite";
@@ -37,6 +37,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         {
             new()
             {
+                PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
                 Key = SearchTree,
                 Value = SearchTreeDefault,
                 DisplayLabel = "Search as tree",
@@ -44,10 +45,12 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             },
             new()
             {
-                Key = DefaultOnly,
-                Value = DefaultOnlyDefault,
-                DisplayLabel = "Default profile only",
-                DisplayDescription = "Show favorites only from the default Microsoft Edge profile.",
+                PluginOptionType = PluginAdditionalOption.AdditionalOptionType.MultilineTextbox,
+                Key = ExcludedProfiles,
+                DisplayLabel = "Excluded profiles",
+                DisplayDescription = "Prevents favorites from the specified profiles to be loaded. Add one profile per line.",
+                PlaceholderText = "Example: Personal",
+                TextValue = string.Empty,
             },
         };
 
@@ -62,7 +65,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _context.API.ThemeChanged += OnThemeChanged;
             UpdateIconsPath(_context.API.GetCurrentTheme());
-            _profileManager.ReloadProfiles(_defaultOnly);
+            _profileManager.ReloadProfiles(_excludedProfiles);
         }
 
         public List<Result> Query(Query query)
@@ -81,11 +84,12 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             else
             {
                 var results = new List<Result>();
+                var emptyQuery = string.IsNullOrWhiteSpace(query.Search);
 
                 foreach (var favorite in _favoriteQuery.GetAll())
                 {
                     var score = StringMatcher.FuzzySearch(query.Search, favorite.Name);
-                    if (string.IsNullOrWhiteSpace(query.Search) || score.Score > 0)
+                    if (emptyQuery || score.Score > 0)
                     {
                         var result = favorite.CreateResult(_context!.API, query.ActionKeyword, showProfileName, _searchTree);
                         result.Score = score.Score;
@@ -105,22 +109,22 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public void UpdateSettings(PowerLauncherPluginSettings settings)
         {
-            var oldDefaultOnly = _defaultOnly;
+            var oldExcludedProfiles = _excludedProfiles.ToArray();
 
             if (settings != null && settings.AdditionalOptions != null)
             {
                 _searchTree = settings.AdditionalOptions.FirstOrDefault(x => x.Key == SearchTree)?.Value ?? SearchTreeDefault;
-                _defaultOnly = settings.AdditionalOptions.FirstOrDefault(x => x.Key == DefaultOnly)?.Value ?? DefaultOnlyDefault;
+                _excludedProfiles = settings.AdditionalOptions.FirstOrDefault(x => x.Key == ExcludedProfiles)?.TextValueAsMultilineList.AsReadOnly() ?? ReadOnlyCollection<string>.Empty;
             }
             else
             {
                 _searchTree = SearchTreeDefault;
-                _defaultOnly = DefaultOnlyDefault;
+                _excludedProfiles = ReadOnlyCollection<string>.Empty;
             }
 
-            if (oldDefaultOnly != _defaultOnly)
+            if (!oldExcludedProfiles.SequenceEqual(_excludedProfiles, StringComparer.OrdinalIgnoreCase))
             {
-                _profileManager.ReloadProfiles(_defaultOnly);
+                _profileManager.ReloadProfiles(_excludedProfiles);
             }
         }
 

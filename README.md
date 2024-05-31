@@ -11,7 +11,7 @@ Simple [PowerToys Run](https://learn.microsoft.com/windows/powertoys/run) experi
 ## Requirements
 
 - Microsoft Edge
-- PowerToys minimum version 0.79.0
+- PowerToys minimum version 0.81.0
 
 ## Installation
 
