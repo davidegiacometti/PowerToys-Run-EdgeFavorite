@@ -19,6 +19,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks
             coding.AddChildren(new FavoriteItem("GitHub", "https://github.com/", "Coding/GitHub", _profileInfo));
             coding.AddChildren(new FavoriteItem("Microsoft Azure", "https://portal.azure.com/", "Coding/Microsoft Azure", _profileInfo));
             coding.AddChildren(new FavoriteItem("Microsoft Developer Blogs", "https://devblogs.microsoft.com/", "Coding/Microsoft Developer Blogs", _profileInfo));
+            coding.AddChildren(new FavoriteItem("Windows Blogs", "https://blogs.windows.com/", "Windows Blogs", _profileInfo));
 
             var tools = new FavoriteItem("Tools", "Coding", _profileInfo);
             tools.AddChildren(new FavoriteItem("JWT", "https://jwt.io/", "Coding/Tools/JWT", _profileInfo));

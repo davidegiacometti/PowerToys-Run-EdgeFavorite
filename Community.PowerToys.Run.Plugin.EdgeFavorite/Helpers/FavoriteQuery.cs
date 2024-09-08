@@ -77,7 +77,16 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
         {
             if (depth == path.Length - 1)
             {
-                return node.Children.Where(f => f.Name != null && f.Name.StartsWith(path[depth], StringComparison.OrdinalIgnoreCase));
+                var token = path[depth].TrimEnd('*');
+
+                if (token.Length > 1 && token[0] == '*')
+                {
+                    return node.Children.Where(f => f.Name != null && f.Name.Contains(token.TrimStart('*'), StringComparison.OrdinalIgnoreCase));
+                }
+                else
+                {
+                    return node.Children.Where(f => f.Name != null && f.Name.StartsWith(token, StringComparison.OrdinalIgnoreCase));
+                }
             }
 
             var folder = node.Children.SingleOrDefault(f => f.Type == FavoriteType.Folder && f.Name != null && f.Name.Equals(path[depth], StringComparison.OrdinalIgnoreCase));

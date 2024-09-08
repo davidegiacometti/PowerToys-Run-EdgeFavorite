@@ -31,14 +31,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Should_Get_All_Favorites()
         {
             var result = _singleFavoriteQuery.GetAll();
-            Assert.AreEqual(result.Count(), 13);
+            Assert.AreEqual(result.Count(), 14);
         }
 
         [TestMethod]
         public void Should_Get_All_Favorites_From_All_Profiles()
         {
             var result = _multiFavoriteQuery.GetAll();
-            Assert.AreEqual(result.Count(), 18);
+            Assert.AreEqual(result.Count(), 19);
         }
 
         [DataTestMethod]
@@ -47,12 +47,20 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         [DataRow("S", 2)]
         [DataRow("Empty", 0)]
         [DataRow("Codi", 1)]
+        [DataRow("Codi*", 1)]
         [DataRow("Codi/", 0)]
-        [DataRow("Coding/", 4)]
+        [DataRow("Coding/", 5)]
+        [DataRow("Coding/*", 5)]
         [DataRow("Coding/Tools", 1)]
         [DataRow("Coding/Tools/", 2)]
         [DataRow("coding/tools/j", 1)]
-        [DataRow("coding\\tools\\j", 1)]
+        [DataRow(@"coding\tools\j", 1)]
+        [DataRow("coding/*blo", 2)]
+        [DataRow("coding/*blo*", 2)]
+        [DataRow("coding/blo*", 0)]
+        [DataRow("*ing", 2)]
+        [DataRow("*ing*", 2)]
+        [DataRow("ing*", 0)]
         public void Should_Get_Expected_Result(string search, int expectedResult)
         {
             var result = _singleFavoriteQuery.Search(search);
@@ -70,7 +78,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Should_Merge_Folders_Content()
         {
             var result = _multiFavoriteQuery.Search("Coding/");
-            Assert.AreEqual(result.Count(), 7);
+            Assert.AreEqual(result.Count(), 8);
         }
     }
 }
