@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Properties;
 using ManagedCommon;
 using Wox.Plugin;
 using Wox.Plugin.Logger;
@@ -71,7 +72,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                 var result = new Result
                 {
                     Title = Name,
-                    SubTitle = showProfileName ? $"Folder: {Path} - {Profile.Name}" : $"Folder: {Path}",
+                    SubTitle = showProfileName
+                        ? string.Format(Resources.FolderResult_Profile_Subtitle, Path, Profile.Name)
+                        : string.Format(Resources.FolderResult_Subtitle, Path),
                     IcoPath = _folderIcoPath,
                     QueryTextDisplay = $"{Path}/",
                     ContextData = this,
@@ -97,7 +100,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                 return new Result
                 {
                     Title = Name,
-                    SubTitle = showProfileName ? $"Favorite: {Path} - {Profile.Name}" : $"Favorite: {Path}",
+                    SubTitle = showProfileName
+                        ? string.Format(Resources.FavoriteResult_Profile_Subtitle, Path, Profile.Name)
+                        : string.Format(Resources.FavoriteResult_Subtitle, Path),
                     IcoPath = _urlIcoPath,
                     QueryTextDisplay = searchTree ? Path : Name,
                     Action = _ =>
@@ -128,7 +133,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     {
                         new()
                         {
-                            Title = $"Open all ({childFavoritesCount}) (Ctrl+O)",
+                            Title = string.Format(Resources.Action_OpenAll, childFavoritesCount),
                             Glyph = "\xE737",
                             FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                             AcceleratorKey = Key.O,
@@ -138,7 +143,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         },
                         new()
                         {
-                            Title = $"Open all ({childFavoritesCount}) in new window (Ctrl+N)",
+                            Title = string.Format(Resources.Action_OpenAllWindow, childFavoritesCount),
                             Glyph = "\xE8A7",
                             FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                             AcceleratorKey = Key.N,
@@ -148,7 +153,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         },
                         new()
                         {
-                            Title = $"Open all ({childFavoritesCount}) in InPrivate window (Ctrl+P)",
+                            Title = string.Format(Resources.Action_OpenAllPrivate, childFavoritesCount),
                             Glyph = "\xE727",
                             FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                             AcceleratorKey = Key.P,
@@ -165,7 +170,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                 {
                     new()
                     {
-                        Title = "Copy URL (Ctrl+C)",
+                        Title = Resources.Action_CopyUrl,
                         Glyph = "\xE8C8",
                         FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.C,
@@ -187,7 +192,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     },
                     new()
                     {
-                        Title = "Open in new window (Ctrl+N)",
+                        Title = Resources.Action_OpenWindow,
                         Glyph = "\xE8A7",
                         FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.N,
@@ -201,7 +206,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     },
                     new()
                     {
-                        Title = "Open in InPrivate window (Ctrl+P)",
+                        Title = Resources.Action_OpenPrivate,
                         Glyph = "\xE727",
                         FontFamily = "Segoe Fluent Icons,Segoe MDL2 Assets",
                         AcceleratorKey = Key.P,

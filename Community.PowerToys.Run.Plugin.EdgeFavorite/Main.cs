@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Controls;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Properties;
 using ManagedCommon;
 using Microsoft.PowerToys.Settings.UI.Library;
 using Wox.Infrastructure;
@@ -15,7 +16,7 @@ using Wox.Plugin;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 {
-    public sealed class Main : IPlugin, ISettingProvider, IContextMenu, IDisposable
+    public sealed class Main : IPlugin, IPluginI18n, ISettingProvider, IContextMenu, IDisposable
     {
         public static string PluginID => "D73A7EF0633F4C82A14454FFD848F447";
 
@@ -29,9 +30,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         private ReadOnlyCollection<string> _excludedProfiles = ReadOnlyCollection<string>.Empty;
         private bool _disposed;
 
-        public string Name => "Edge Favorite";
+        public string Name => Resources.PluginName;
 
-        public string Description => "Opens Microsoft Edge favorites";
+        public string Description => Resources.PluginDescription;
 
         public IEnumerable<PluginAdditionalOption> AdditionalOptions => new List<PluginAdditionalOption>
         {
@@ -40,16 +41,16 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
                 Key = SearchTree,
                 Value = SearchTreeDefault,
-                DisplayLabel = "Search as tree",
-                DisplayDescription = "Navigate the folder tree when searching.",
+                DisplayLabel = Resources.Option_SearchTree_Label,
+                DisplayDescription = Resources.Option_SearchTree_Description,
             },
             new()
             {
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.MultilineTextbox,
                 Key = ExcludedProfiles,
-                DisplayLabel = "Excluded profiles",
-                DisplayDescription = "Prevents favorites from the specified profiles to be loaded. Add one profile per line.",
-                PlaceholderText = "Example: Personal",
+                DisplayLabel = Resources.Option_ExcludedProfiles_Label,
+                DisplayDescription = Resources.Option_ExcludedProfiles_Description,
+                PlaceholderText = Resources.Option_ExcludedProfiles_Placeholder,
                 TextValue = string.Empty,
             },
         };
@@ -59,6 +60,10 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
             _profileManager = new ProfileManager();
             _favoriteQuery = new FavoriteQuery(_profileManager);
         }
+
+        public string GetTranslatedPluginTitle() => Resources.PluginName;
+
+        public string GetTranslatedPluginDescription() => Resources.PluginDescription;
 
         public void Init(PluginInitContext context)
         {

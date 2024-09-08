@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Davide Giacometti. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Globalization;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wox.Plugin;
@@ -17,6 +18,13 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         {
             _context = new PluginInitContext();
             _profileInfo = new ProfileInfo("Default", "Default");
+        }
+
+        [ClassInitialize]
+        public static void Initialize(TestContext context)
+        {
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
         }
 
         [DataTestMethod]
