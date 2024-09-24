@@ -69,32 +69,32 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                     return;
                 }
 
-                var newRoot = new FavoriteItem(ProfileInfo);
+                var root = new FavoriteItem(ProfileInfo);
                 rootElement.TryGetProperty("bookmark_bar", out var bookmarkBarElement);
                 if (bookmarkBarElement.ValueKind == JsonValueKind.Object)
                 {
-                    ProcessFavorites(bookmarkBarElement, newRoot, string.Empty, true);
+                    ProcessFavorites(bookmarkBarElement, root, string.Empty, true, false);
                 }
 
                 rootElement.TryGetProperty("other", out var otherElement);
                 if (otherElement.ValueKind == JsonValueKind.Object)
                 {
-                    ProcessFavorites(otherElement, newRoot, string.Empty, newRoot.Children.Count == 0);
+                    ProcessFavorites(otherElement, root, string.Empty, root.Children.Count == 0, true);
                 }
 
                 rootElement.TryGetProperty("synced", out var syncedElement);
                 if (syncedElement.ValueKind == JsonValueKind.Object)
                 {
-                    ProcessFavorites(syncedElement, newRoot, string.Empty, newRoot.Children.Count == 0);
+                    ProcessFavorites(syncedElement, root, string.Empty, root.Children.Count == 0, true);
                 }
 
                 rootElement.TryGetProperty("workspaces", out var workspacesElement);
                 if (workspacesElement.ValueKind == JsonValueKind.Object)
                 {
-                    ProcessFavorites(workspacesElement, newRoot, string.Empty, newRoot.Children.Count == 0);
+                    ProcessFavorites(workspacesElement, root, string.Empty, root.Children.Count == 0, true);
                 }
 
-                _root = newRoot;
+                _root = root;
             }
             catch (Exception ex)
             {
@@ -102,7 +102,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
             }
         }
 
-        private void ProcessFavorites(JsonElement element, FavoriteItem parent, string path, bool root)
+        private void ProcessFavorites(JsonElement element, FavoriteItem parent, string path, bool root, bool specialFolder)
         {
             if (element.ValueKind == JsonValueKind.Object && element.TryGetProperty("children", out var children))
             {
@@ -114,7 +114,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                         path += $"{(string.IsNullOrWhiteSpace(path) ? string.Empty : "/")}{name}";
                     }
 
-                    var folder = new FavoriteItem(name, path, ProfileInfo);
+                    var folder = new FavoriteItem(name, path, ProfileInfo, specialFolder);
 
                     if (root)
                     {
@@ -130,7 +130,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                         using var childEnumerator = children.EnumerateArray();
                         foreach (var child in childEnumerator)
                         {
-                            ProcessFavorites(child, folder, path, false);
+                            ProcessFavorites(child, folder, path, false, false);
                         }
                     }
                 }

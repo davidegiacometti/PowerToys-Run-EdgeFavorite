@@ -32,7 +32,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         [DataRow("DevOps", "Coding/DevOps", false, "Coding/DevOps/")]
         public void Assert_Folder_Item_Result_QueryTextDisplay(string name, string path, bool searchTree, string expectedQueryTextDisplay)
         {
-            var item = new FavoriteItem(name, path, _profileInfo);
+            var item = new FavoriteItem(name, path, _profileInfo, false);
             var result = item.CreateResult(_context.API, string.Empty, false, searchTree);
             Assert.AreEqual(result.QueryTextDisplay, expectedQueryTextDisplay);
         }
@@ -62,7 +62,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         [DataRow("GitHub", "Coding/GitHub", false, "Folder: Coding/GitHub")]
         public void Assert_Folder_Item_Result_SubTitle(string name, string path, bool showProfileName, string expectedSubTitle)
         {
-            var item = new FavoriteItem(name, path, _profileInfo);
+            var item = new FavoriteItem(name, path, _profileInfo, false);
             var result = item.CreateResult(_context.API, string.Empty, showProfileName, false);
             Assert.AreEqual(result.SubTitle, expectedSubTitle);
         }

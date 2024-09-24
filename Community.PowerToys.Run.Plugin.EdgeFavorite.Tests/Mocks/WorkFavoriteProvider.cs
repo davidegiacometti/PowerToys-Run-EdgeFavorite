@@ -15,12 +15,12 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks
 
         public WorkFavoriteProvider()
         {
-            var coding = new FavoriteItem("Coding", "Coding", _profileInfo);
+            var coding = new FavoriteItem("Coding", "Coding", _profileInfo, false);
             coding.AddChildren(new FavoriteItem("AWS", "https://aws.amazon.com/", "Coding/AWS", _profileInfo));
             coding.AddChildren(new FavoriteItem("Bitbucket", "https://bitbucket.org/", "Coding/Bitbucket", _profileInfo));
             coding.AddChildren(new FavoriteItem("Microsoft Azure", "https://portal.azure.com/", "Coding/Microsoft Azure", _profileInfo));
 
-            _root = new FavoriteItem("Favorites bar", string.Empty, _profileInfo);
+            _root = new FavoriteItem("Favorites bar", string.Empty, _profileInfo, false);
             _root.AddChildren(new FavoriteItem("Gmail", "https://mail.google.com/", "Gmail", _profileInfo));
             _root.AddChildren(coding);
         }

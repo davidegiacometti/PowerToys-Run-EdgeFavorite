@@ -83,6 +83,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                     .Search(query.Search)
                     .OrderBy(f => f.Type)
                     .ThenBy(f => f.Name)
+                    .Where(f => !f.IsEmptySpecialFolder)
                     .Select(f => f.CreateResult(_context!.API, query.ActionKeyword, showProfileName, _searchTree))
                     .ToList();
             }
@@ -91,7 +92,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                 var results = new List<Result>();
                 var emptyQuery = string.IsNullOrWhiteSpace(query.Search);
 
-                foreach (var favorite in _favoriteQuery.GetAll())
+                foreach (var favorite in _favoriteQuery.GetAll().Where(f => !f.IsEmptySpecialFolder))
                 {
                     var score = StringMatcher.FuzzySearch(query.Search, favorite.Name);
                     if (emptyQuery || score.Score > 0)

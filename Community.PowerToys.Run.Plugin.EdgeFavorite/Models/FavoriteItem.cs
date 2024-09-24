@@ -22,6 +22,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
         private static string? _folderIcoPath;
         private static string? _urlIcoPath;
         private readonly List<FavoriteItem> _children = new();
+        private readonly bool _special;
 
         public string Name { get; }
 
@@ -35,6 +36,8 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
 
         public ReadOnlyCollection<FavoriteItem> Children => _children.AsReadOnly();
 
+        public bool IsEmptySpecialFolder => _special && Children.Count == 0;
+
         public FavoriteItem(ProfileInfo profile)
         {
             Name = string.Empty;
@@ -43,12 +46,13 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             Profile = profile;
         }
 
-        public FavoriteItem(string name, string path, ProfileInfo profile)
+        public FavoriteItem(string name, string path, ProfileInfo profile, bool special)
         {
             Name = name;
             Path = path;
             Type = FavoriteType.Folder;
             Profile = profile;
+            _special = special;
         }
 
         public FavoriteItem(string name, string url, string path, ProfileInfo profile)
@@ -107,7 +111,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     QueryTextDisplay = searchTree ? Path : Name,
                     Action = _ =>
                     {
-                        EdgeHelpers.OpenInEdge(this, false, false);
+                        EdgeHelpers.Open(this, false, false);
                         return true;
                     },
                     ToolTipData = new ToolTipData(Name, Url),
@@ -139,7 +143,11 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                             AcceleratorKey = Key.O,
                             AcceleratorModifiers = ModifierKeys.Control,
                             PluginName = _pluginName,
-                            Action = _ => OpenAll(childFavorites, false, false),
+                            Action = _ =>
+                            {
+                                EdgeHelpers.Open(childFavorites, false, false);
+                                return true;
+                            },
                         },
                         new()
                         {
@@ -149,7 +157,11 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                             AcceleratorKey = Key.N,
                             AcceleratorModifiers = ModifierKeys.Control,
                             PluginName = _pluginName,
-                            Action = _ => OpenAll(childFavorites, false, true),
+                            Action = _ =>
+                            {
+                                EdgeHelpers.Open(childFavorites, false, true);
+                                return true;
+                            },
                         },
                         new()
                         {
@@ -159,7 +171,11 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                             AcceleratorKey = Key.P,
                             AcceleratorModifiers = ModifierKeys.Control,
                             PluginName = _pluginName,
-                            Action = _ => OpenAll(childFavorites, true, false),
+                            Action = _ =>
+                            {
+                                EdgeHelpers.Open(childFavorites, true, false);
+                                return true;
+                            },
                         },
                     };
                 }
@@ -200,7 +216,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         PluginName = _pluginName,
                         Action = _ =>
                         {
-                            EdgeHelpers.OpenInEdge(this, false, true);
+                            EdgeHelpers.Open(this, false, true);
                             return true;
                         },
                     },
@@ -214,7 +230,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         PluginName = _pluginName,
                         Action = _ =>
                         {
-                            EdgeHelpers.OpenInEdge(this, true, false);
+                            EdgeHelpers.Open(this, true, false);
                             return true;
                         },
                     },
@@ -236,29 +252,6 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                 _folderIcoPath = "Images/Folder.dark.png";
                 _urlIcoPath = "Images/Url.dark.png";
             }
-        }
-
-        private static bool OpenAll(FavoriteItem[] favorites, bool inPrivate, bool newWindow)
-        {
-            if (favorites.Length == 0)
-            {
-                throw new InvalidOperationException("Favorites cannot be empty.");
-            }
-
-            // If there is no need to open in a new window, starting multiple processes is preferred to avoid long command line arguments
-            if (newWindow)
-            {
-                EdgeHelpers.OpenInEdge(favorites[0].Profile, string.Join(" ", favorites.Select(f => f.Url!)), inPrivate, newWindow);
-            }
-            else
-            {
-                foreach (var favorite in favorites)
-                {
-                    EdgeHelpers.OpenInEdge(favorite, inPrivate, false);
-                }
-            }
-
-            return true;
         }
     }
 }
