@@ -82,6 +82,18 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
                     ProcessFavorites(otherElement, newRoot, string.Empty, newRoot.Children.Count == 0);
                 }
 
+                rootElement.TryGetProperty("synced", out var syncedElement);
+                if (syncedElement.ValueKind == JsonValueKind.Object)
+                {
+                    ProcessFavorites(syncedElement, newRoot, string.Empty, newRoot.Children.Count == 0);
+                }
+
+                rootElement.TryGetProperty("workspaces", out var workspacesElement);
+                if (workspacesElement.ValueKind == JsonValueKind.Object)
+                {
+                    ProcessFavorites(workspacesElement, newRoot, string.Empty, newRoot.Children.Count == 0);
+                }
+
                 _root = newRoot;
             }
             catch (Exception ex)
