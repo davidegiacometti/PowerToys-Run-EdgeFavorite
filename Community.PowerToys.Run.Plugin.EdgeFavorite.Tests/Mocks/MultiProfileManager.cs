@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Services;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks
 {

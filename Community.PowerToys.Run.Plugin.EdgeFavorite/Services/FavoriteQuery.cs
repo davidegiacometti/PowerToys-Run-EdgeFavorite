@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 {
     public class FavoriteQuery : IFavoriteQuery
     {

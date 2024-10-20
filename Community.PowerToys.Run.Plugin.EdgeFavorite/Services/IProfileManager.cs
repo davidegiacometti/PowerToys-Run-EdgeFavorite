@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 {
     public interface IProfileManager
     {

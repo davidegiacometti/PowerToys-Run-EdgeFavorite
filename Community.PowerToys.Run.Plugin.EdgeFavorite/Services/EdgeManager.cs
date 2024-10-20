@@ -11,7 +11,7 @@ using Windows.Management.Deployment;
 using Wox.Infrastructure;
 using Wox.Plugin.Logger;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 {
     public class EdgeManager : IEdgeManager
     {

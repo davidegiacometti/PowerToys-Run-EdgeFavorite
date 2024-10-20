@@ -10,7 +10,7 @@ using System.Text.Json;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
 using Wox.Plugin.Logger;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 {
     public sealed partial class ProfileManager : IProfileManager, IDisposable
     {
