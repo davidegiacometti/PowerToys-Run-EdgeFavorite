@@ -12,23 +12,36 @@ using Wox.Plugin.Logger;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 {
-    public sealed class ProfileManager : IProfileManager, IDisposable
+    public sealed partial class ProfileManager : IProfileManager, IDisposable
     {
-        private static readonly string _userDataPath = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\Microsoft\Edge\User Data");
+        private readonly EdgeManager _edgeManager;
         private readonly List<IFavoriteProvider> _favoriteProviders = new();
         private bool _disposed;
 
         public ReadOnlyCollection<IFavoriteProvider> FavoriteProviders => _favoriteProviders.AsReadOnly();
 
+        public ProfileManager(EdgeManager edgeManager)
+        {
+            _edgeManager = edgeManager;
+        }
+
         public void ReloadProfiles(IEnumerable<string> excluded)
         {
+            var userDataPath = _edgeManager.UserDataPath;
+
+            if (!Path.Exists(userDataPath))
+            {
+                Log.Error($"User data {userDataPath} is not a valid path.", typeof(ProfileManager));
+                return;
+            }
+
             if (_favoriteProviders.Count > 0)
             {
                 DisposeFavoriteProviders();
                 _favoriteProviders.Clear();
             }
 
-            foreach (var path in Directory.GetFiles(_userDataPath, "Bookmarks", new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 2 }))
+            foreach (var path in Directory.GetFiles(userDataPath, "Bookmarks", new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 2 }))
             {
                 var directory = Directory.GetParent(path);
 
@@ -107,9 +120,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Helpers
 
         private void DisposeFavoriteProviders()
         {
-            foreach (var privider in _favoriteProviders)
+            foreach (var provider in _favoriteProviders)
             {
-                if (privider is IDisposable disposableProvider)
+                if (provider is IDisposable disposableProvider)
                 {
                     disposableProvider.Dispose();
                 }

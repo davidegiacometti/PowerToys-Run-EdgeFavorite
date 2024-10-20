@@ -115,6 +115,42 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Beta.
+        /// </summary>
+        internal static string Channel_Beta {
+            get {
+                return ResourceManager.GetString("Channel_Beta", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Canary.
+        /// </summary>
+        internal static string Channel_Canary {
+            get {
+                return ResourceManager.GetString("Channel_Canary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dev.
+        /// </summary>
+        internal static string Channel_Dev {
+            get {
+                return ResourceManager.GetString("Channel_Dev", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stable.
+        /// </summary>
+        internal static string Channel_Stable {
+            get {
+                return ResourceManager.GetString("Channel_Stable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Favorite: {0} - {1}.
         /// </summary>
         internal static string FavoriteResult_Profile_Subtitle {
@@ -147,6 +183,42 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Properties {
         internal static string FolderResult_Subtitle {
             get {
                 return ResourceManager.GetString("FolderResult_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install the corresponding version or switch channel from the plugin settings.
+        /// </summary>
+        internal static string MissingChannel_Subtitle {
+            get {
+                return ResourceManager.GetString("MissingChannel_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft Edge {0} not found.
+        /// </summary>
+        internal static string MissingChannel_Title {
+            get {
+                return ResourceManager.GetString("MissingChannel_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the channel to use..
+        /// </summary>
+        internal static string Option_Channel_Description {
+            get {
+                return ResourceManager.GetString("Option_Channel_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel.
+        /// </summary>
+        internal static string Option_Channel_Label {
+            get {
+                return ResourceManager.GetString("Option_Channel_Label", resourceCulture);
             }
         }
         

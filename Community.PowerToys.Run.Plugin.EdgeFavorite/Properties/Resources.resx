@@ -175,4 +175,29 @@
   <data name="Action_OpenWindow" xml:space="preserve">
     <value>Open in new window (Ctrl+N)</value>
   </data>
+  <data name="MissingChannel_Subtitle" xml:space="preserve">
+    <value>Install the corresponding version or switch channel from the plugin settings</value>
+  </data>
+  <data name="MissingChannel_Title" xml:space="preserve">
+    <value>Microsoft Edge {0} not found</value>
+    <comment>{0} is the channel: Stable, Beta, ...</comment>
+  </data>
+  <data name="Channel_Stable" xml:space="preserve">
+    <value>Stable</value>
+  </data>
+  <data name="Channel_Dev" xml:space="preserve">
+    <value>Dev</value>
+  </data>
+  <data name="Channel_Canary" xml:space="preserve">
+    <value>Canary</value>
+  </data>
+  <data name="Channel_Beta" xml:space="preserve">
+    <value>Beta</value>
+  </data>
+  <data name="Option_Channel_Description" xml:space="preserve">
+    <value>Select the channel to use.</value>
+  </data>
+  <data name="Option_Channel_Label" xml:space="preserve">
+    <value>Channel</value>
+  </data>
 </root>

@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wox.Plugin;
 
@@ -12,11 +13,13 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
     public class FavoriteItemTest
     {
         private readonly PluginInitContext _context;
+        private readonly MockEdgeManager _edgeManager;
         private readonly ProfileInfo _profileInfo;
 
         public FavoriteItemTest()
         {
             _context = new PluginInitContext();
+            _edgeManager = new MockEdgeManager();
             _profileInfo = new ProfileInfo("Default", "Default");
         }
 
@@ -33,7 +36,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Assert_Folder_Item_Result_QueryTextDisplay(string name, string path, bool searchTree, string expectedQueryTextDisplay)
         {
             var item = new FavoriteItem(name, path, _profileInfo, false);
-            var result = item.CreateResult(_context.API, string.Empty, false, searchTree);
+            var result = item.CreateResult(_context.API, _edgeManager, string.Empty, false, searchTree);
             Assert.AreEqual(result.QueryTextDisplay, expectedQueryTextDisplay);
         }
 
@@ -43,7 +46,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Assert_Url_Item_Result_QueryTextDisplay(string name, string url, string path, bool searchTree, string expectedQueryTextDisplay)
         {
             var item = new FavoriteItem(name, url, path, _profileInfo);
-            var result = item.CreateResult(_context.API, string.Empty, false, searchTree);
+            var result = item.CreateResult(_context.API, _edgeManager, string.Empty, false, searchTree);
             Assert.AreEqual(result.QueryTextDisplay, expectedQueryTextDisplay);
         }
 
@@ -53,7 +56,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Assert_Url_Item_Result_SubTitle(string name, string url, string path, bool showProfileName, string expectedSubTitle)
         {
             var item = new FavoriteItem(name, url, path, _profileInfo);
-            var result = item.CreateResult(_context.API, string.Empty, showProfileName, false);
+            var result = item.CreateResult(_context.API, _edgeManager, string.Empty, showProfileName, false);
             Assert.AreEqual(result.SubTitle, expectedSubTitle);
         }
 
@@ -63,7 +66,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Assert_Folder_Item_Result_SubTitle(string name, string path, bool showProfileName, string expectedSubTitle)
         {
             var item = new FavoriteItem(name, path, _profileInfo, false);
-            var result = item.CreateResult(_context.API, string.Empty, showProfileName, false);
+            var result = item.CreateResult(_context.API, _edgeManager, string.Empty, showProfileName, false);
             Assert.AreEqual(result.SubTitle, expectedSubTitle);
         }
     }

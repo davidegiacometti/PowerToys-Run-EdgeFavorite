@@ -69,7 +69,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             _children.Add(item);
         }
 
-        public Result CreateResult(IPublicAPI api, string actionKeyword, bool showProfileName, bool searchTree)
+        public Result CreateResult(IPublicAPI api, IEdgeManager edgeManager, string actionKeyword, bool showProfileName, bool searchTree)
         {
             if (Type == FavoriteType.Folder)
             {
@@ -111,7 +111,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                     QueryTextDisplay = searchTree ? Path : Name,
                     Action = _ =>
                     {
-                        EdgeHelpers.Open(this, false, false);
+                        edgeManager.Open(this, false, false);
                         return true;
                     },
                     ToolTipData = new ToolTipData(Name, Url),
@@ -124,7 +124,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
             }
         }
 
-        public List<ContextMenuResult> CreateContextMenuResult()
+        public List<ContextMenuResult> CreateContextMenuResult(EdgeManager edgeManager)
         {
             if (Type == FavoriteType.Folder)
             {
@@ -145,7 +145,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                             PluginName = _pluginName,
                             Action = _ =>
                             {
-                                EdgeHelpers.Open(childFavorites, false, false);
+                                edgeManager.Open(childFavorites, false, false);
                                 return true;
                             },
                         },
@@ -159,7 +159,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                             PluginName = _pluginName,
                             Action = _ =>
                             {
-                                EdgeHelpers.Open(childFavorites, false, true);
+                                edgeManager.Open(childFavorites, false, true);
                                 return true;
                             },
                         },
@@ -173,7 +173,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                             PluginName = _pluginName,
                             Action = _ =>
                             {
-                                EdgeHelpers.Open(childFavorites, true, false);
+                                edgeManager.Open(childFavorites, true, false);
                                 return true;
                             },
                         },
@@ -216,7 +216,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         PluginName = _pluginName,
                         Action = _ =>
                         {
-                            EdgeHelpers.Open(this, false, true);
+                            edgeManager.Open(this, false, true);
                             return true;
                         },
                     },
@@ -230,7 +230,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Models
                         PluginName = _pluginName,
                         Action = _ =>
                         {
-                            EdgeHelpers.Open(this, true, false);
+                            edgeManager.Open(this, true, false);
                             return true;
                         },
                     },

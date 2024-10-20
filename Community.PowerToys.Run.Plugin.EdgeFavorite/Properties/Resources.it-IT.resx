@@ -162,10 +162,34 @@
   <data name="Action_CopyUrl" xml:space="preserve">
     <value>Copia URL (Ctrl+C)</value>
   </data>
+  <data name="Action_OpenPrivate" xml:space="preserve">
+    <value>Apri in una finestra InPrivate (Ctrl+P)</value>
+  </data>
   <data name="Action_OpenWindow" xml:space="preserve">
     <value>Apri in una nuova finestra (Ctrl+N)</value>
   </data>
-  <data name="Action_OpenPrivate" xml:space="preserve">
-    <value>Apri in una finestra InPrivate (Ctrl+P)</value>
+  <data name="MissingChannel_Subtitle" xml:space="preserve">
+    <value>Installa la versione corrispondente o cambia canale dalle impostazioni del plugin</value>
+  </data>
+  <data name="MissingChannel_Title" xml:space="preserve">
+    <value>Microsoft Edge {0} non trovato</value>
+  </data>
+  <data name="Channel_Stable" xml:space="preserve">
+    <value>Stabile</value>
+  </data>
+  <data name="Channel_Dev" xml:space="preserve">
+    <value>Sviluppo</value>
+  </data>
+  <data name="Channel_Canary" xml:space="preserve">
+    <value>Canary</value>
+  </data>
+  <data name="Channel_Beta" xml:space="preserve">
+    <value>Beta</value>
+  </data>
+  <data name="Option_Channel_Description" xml:space="preserve">
+    <value>Seleziona il canale da utilizzare.</value>
+  </data>
+  <data name="Option_Channel_Label" xml:space="preserve">
+    <value>Canale</value>
   </data>
 </root>
