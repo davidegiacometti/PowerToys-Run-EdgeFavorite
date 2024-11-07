@@ -2,9 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Models;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Services
 {
     public interface IFavoriteQuery
     {

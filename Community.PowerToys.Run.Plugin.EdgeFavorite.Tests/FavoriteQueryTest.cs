@@ -3,7 +3,7 @@
 
 using System;
 using System.Linq;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Services;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Services;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

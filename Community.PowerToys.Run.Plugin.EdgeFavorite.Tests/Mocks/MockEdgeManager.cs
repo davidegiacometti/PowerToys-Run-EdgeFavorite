@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Davide Giacometti. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Services;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Models;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Services;
 
 namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks
 {
@@ -16,12 +16,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests.Mocks
         {
         }
 
-        public void Open(FavoriteItem favorite, bool inPrivate, bool newWindow)
+        public bool Open(FavoriteItem favorite, bool inPrivate, bool newWindow)
         {
+            return true;
         }
 
-        public void Open(FavoriteItem[] favorites, bool inPrivate, bool newWindow)
+        public bool Open(FavoriteItem[] favorites, bool inPrivate, bool newWindow)
         {
+            return true;
         }
     }
 }

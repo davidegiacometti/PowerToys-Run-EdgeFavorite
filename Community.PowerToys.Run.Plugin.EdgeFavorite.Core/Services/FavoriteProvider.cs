@@ -4,13 +4,13 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
-using Wox.Plugin.Logger;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Models;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Services
 {
     public sealed class FavoriteProvider : IFavoriteProvider, IDisposable
     {
+        private readonly ILogger _logger;
         private readonly string _path;
         private readonly FileSystemWatcher _watcher;
         private FavoriteItem _root;
@@ -20,8 +20,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 
         public ProfileInfo ProfileInfo { get; }
 
-        public FavoriteProvider(string path, ProfileInfo profileInfo)
+        public FavoriteProvider(ILogger logger, string path, ProfileInfo profileInfo)
         {
+            _logger = logger;
             _path = path;
             ProfileInfo = profileInfo;
             _root = new FavoriteItem(profileInfo);
@@ -55,7 +56,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
             {
                 if (!Path.Exists(_path))
                 {
-                    Log.Warn($"Failed to find Bookmarks file: {_path}", typeof(FavoriteProvider));
+                    _logger.LogWarning($"Failed to find Bookmarks file: {_path}", typeof(FavoriteProvider));
                     return;
                 }
 
@@ -98,7 +99,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
             }
             catch (Exception ex)
             {
-                Log.Exception($"Failed to read favorites: {_path}", ex, typeof(FavoriteProvider));
+                _logger.LogError(ex, $"Failed to read favorites: {_path}", typeof(FavoriteProvider));
             }
         }
 

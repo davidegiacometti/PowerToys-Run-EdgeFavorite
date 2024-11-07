@@ -3,18 +3,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Models;
 using Windows.Management.Deployment;
-using Wox.Infrastructure;
-using Wox.Plugin.Logger;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Services
 {
     public class EdgeManager : IEdgeManager
     {
+        private readonly ILogger _logger;
         private readonly PackageManager _packageManager;
 
         private readonly Dictionary<Channel, (string PackageName, string UserDataParentFolder)> _packages = new()
@@ -32,8 +33,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 
         public bool ChannelDetected => _openCommand != null && _userDataPath != null;
 
-        public EdgeManager()
+        public EdgeManager(ILogger logger)
         {
+            _logger = logger;
             _packageManager = new PackageManager();
         }
 
@@ -62,12 +64,12 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
             }
         }
 
-        public void Open(FavoriteItem favorite, bool inPrivate, bool newWindow)
+        public bool Open(FavoriteItem favorite, bool inPrivate, bool newWindow)
         {
-            OpenInternal(favorite.Profile, favorite.Url!, inPrivate, newWindow);
+            return OpenInternal(favorite.Profile, favorite.Url!, inPrivate, newWindow);
         }
 
-        public void Open(FavoriteItem[] favorites, bool inPrivate, bool newWindow)
+        public bool Open(FavoriteItem[] favorites, bool inPrivate, bool newWindow)
         {
             if (favorites.Length == 0)
             {
@@ -77,23 +79,30 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
             // If there is no need to open in a new window, starting multiple processes is preferred to avoid long command line arguments
             if (newWindow)
             {
-                Open(favorites[0].Profile, string.Join(" ", favorites.Select(f => f.Url!)), inPrivate, newWindow);
+                return Open(favorites[0].Profile, string.Join(" ", favorites.Select(f => f.Url!)), inPrivate, newWindow);
             }
             else
             {
+                var result = true;
+
                 foreach (var favorite in favorites)
                 {
-                    Open(favorite, inPrivate, false);
+                    if (!Open(favorite, inPrivate, false))
+                    {
+                        result = false;
+                    }
                 }
+
+                return result;
             }
         }
 
-        private void Open(ProfileInfo profileInfo, string urls, bool inPrivate, bool newWindow)
+        private bool Open(ProfileInfo profileInfo, string urls, bool inPrivate, bool newWindow)
         {
-            OpenInternal(profileInfo, urls, inPrivate, newWindow);
+            return OpenInternal(profileInfo, urls, inPrivate, newWindow);
         }
 
-        private void OpenInternal(ProfileInfo profileInfo, string urls, bool inPrivate, bool newWindow)
+        private bool OpenInternal(ProfileInfo profileInfo, string urls, bool inPrivate, bool newWindow)
         {
             var args = urls;
 
@@ -111,11 +120,31 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 
             try
             {
-                Helper.OpenInShell(_openCommand, args);
+                OpenInShell(_openCommand!, args);
+                return true;
             }
             catch (Exception ex)
             {
-                Log.Exception("Failed to launch Microsoft Edge", ex, typeof(EdgeManager));
+                _logger.LogError(ex, "Failed to launch Microsoft Edge", typeof(EdgeManager));
+                return false;
+            }
+        }
+
+        private static bool OpenInShell(string path, string args)
+        {
+            using var process = new Process();
+            process.StartInfo.FileName = path;
+            process.StartInfo.Arguments = args;
+            process.StartInfo.UseShellExecute = true;
+
+            try
+            {
+                process.Start();
+                return true;
+            }
+            catch (Win32Exception)
+            {
+                return false;
             }
         }
     }
