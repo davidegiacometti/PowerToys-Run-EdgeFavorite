@@ -10,5 +10,6 @@
   "Website": "https://aka.ms/powertoys",
   "ExecuteFileName": "Community.PowerToys.Run.Plugin.EdgeFavorite.dll",
   "IcoPathDark": "Images\\EdgeFavorite.dark.png",
-  "IcoPathLight": "Images\\EdgeFavorite.light.png"
+  "IcoPathLight": "Images\\EdgeFavorite.light.png",
+  "DynamicLoading": true
 }

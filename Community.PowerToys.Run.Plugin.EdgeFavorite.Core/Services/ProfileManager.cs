@@ -7,21 +7,22 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
-using Wox.Plugin.Logger;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Models;
 
-namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
+namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Services
 {
     public sealed partial class ProfileManager : IProfileManager, IDisposable
     {
+        private readonly ILogger _logger;
         private readonly EdgeManager _edgeManager;
         private readonly List<IFavoriteProvider> _favoriteProviders = new();
         private bool _disposed;
 
         public ReadOnlyCollection<IFavoriteProvider> FavoriteProviders => _favoriteProviders.AsReadOnly();
 
-        public ProfileManager(EdgeManager edgeManager)
+        public ProfileManager(ILogger logger, EdgeManager edgeManager)
         {
+            _logger = logger;
             _edgeManager = edgeManager;
         }
 
@@ -31,7 +32,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
 
             if (!Path.Exists(userDataPath))
             {
-                Log.Error($"User data {userDataPath} is not a valid path.", typeof(ProfileManager));
+                _logger.LogError($"User data {userDataPath} is not a valid path.", typeof(ProfileManager));
                 return;
             }
 
@@ -64,7 +65,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
                 }
 
                 var profile = new ProfileInfo(name, directory.Name);
-                _favoriteProviders.Add(new FavoriteProvider(path, profile));
+                _favoriteProviders.Add(new FavoriteProvider(_logger, path, profile));
             }
         }
 
@@ -79,14 +80,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
             _disposed = true;
         }
 
-        private static string? GetProfileName(string directoryPath)
+        private string? GetProfileName(string directoryPath)
         {
             try
             {
                 var preferencesPath = Path.Combine(directoryPath, "Preferences");
                 if (!File.Exists(preferencesPath))
                 {
-                    Log.Error($"Failed to read profile name: {preferencesPath} files not found.", typeof(ProfileManager));
+                    _logger.LogError($"Failed to read profile name: {preferencesPath} files not found.", typeof(ProfileManager));
                     return null;
                 }
 
@@ -98,14 +99,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
                 profileElement.TryGetProperty("name", out var nameElement);
                 if (nameElement.ValueKind != JsonValueKind.String)
                 {
-                    Log.Error("Failed to read profile name: name property is not a string.", typeof(ProfileManager));
+                    _logger.LogError("Failed to read profile name: name property is not a string.", typeof(ProfileManager));
                     return null;
                 }
 
                 var name = nameElement.GetString();
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    Log.Error("Failed to read profile name: name property is empty.", typeof(ProfileManager));
+                    _logger.LogError("Failed to read profile name: name property is empty.", typeof(ProfileManager));
                     return null;
                 }
 
@@ -113,7 +114,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Services
             }
             catch (Exception ex)
             {
-                Log.Exception("Failed to read profile name", ex, typeof(ProfileManager));
+                _logger.LogError(ex, "Failed to read profile name", typeof(ProfileManager));
                 return null;
             }
         }
