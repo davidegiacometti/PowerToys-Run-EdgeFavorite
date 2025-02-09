@@ -123,12 +123,6 @@
   <data name="PluginDescription" xml:space="preserve">
     <value>Opens Microsoft Edge favorites</value>
   </data>
-  <data name="Option_SearchTree_Label" xml:space="preserve">
-    <value>Search as tree</value>
-  </data>
-  <data name="Option_SearchTree_Description" xml:space="preserve">
-    <value>Navigate the folder tree when searching.</value>
-  </data>
   <data name="Option_ExcludedProfiles_Label" xml:space="preserve">
     <value>Excluded profiles</value>
   </data>
@@ -199,5 +193,20 @@
   </data>
   <data name="Option_Channel_Label" xml:space="preserve">
     <value>Channel</value>
+  </data>
+  <data name="Option_SearchMode_Label" xml:space="preserve">
+    <value>Search mode</value>
+  </data>
+  <data name="Option_SearchMode_Description" xml:space="preserve">
+    <value>Specify how favorites are searched</value>
+  </data>
+  <data name="SearchMode_Flat" xml:space="preserve">
+    <value>Flat (favorites and folders)</value>
+  </data>
+  <data name="SearchMode_Tree" xml:space="preserve">
+    <value>Tree</value>
+  </data>
+  <data name="SearchMode_FlatFavorites" xml:space="preserve">
+    <value>Flat (favorites only)</value>
   </data>
 </root>

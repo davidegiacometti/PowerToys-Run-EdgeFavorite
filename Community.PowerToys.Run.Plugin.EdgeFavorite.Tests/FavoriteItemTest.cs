@@ -37,7 +37,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         {
             var item = new FavoriteItem(name, path, _profileInfo, false);
             var result = item.ToResult(_context.API, _edgeManager, string.Empty, false, searchTree);
-            Assert.AreEqual(result.QueryTextDisplay, expectedQueryTextDisplay);
+            Assert.AreEqual(expectedQueryTextDisplay, result.QueryTextDisplay);
         }
 
         [DataTestMethod]
@@ -47,7 +47,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         {
             var item = new FavoriteItem(name, url, path, _profileInfo);
             var result = item.ToResult(_context.API, _edgeManager, string.Empty, false, searchTree);
-            Assert.AreEqual(result.QueryTextDisplay, expectedQueryTextDisplay);
+            Assert.AreEqual(expectedQueryTextDisplay, result.QueryTextDisplay);
         }
 
         [DataTestMethod]
@@ -57,7 +57,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         {
             var item = new FavoriteItem(name, url, path, _profileInfo);
             var result = item.ToResult(_context.API, _edgeManager, string.Empty, showProfileName, false);
-            Assert.AreEqual(result.SubTitle, expectedSubTitle);
+            Assert.AreEqual(expectedSubTitle, result.SubTitle);
         }
 
         [DataTestMethod]
@@ -67,7 +67,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         {
             var item = new FavoriteItem(name, path, _profileInfo, false);
             var result = item.ToResult(_context.API, _edgeManager, string.Empty, showProfileName, false);
-            Assert.AreEqual(result.SubTitle, expectedSubTitle);
+            Assert.AreEqual(expectedSubTitle, result.SubTitle);
         }
     }
 }

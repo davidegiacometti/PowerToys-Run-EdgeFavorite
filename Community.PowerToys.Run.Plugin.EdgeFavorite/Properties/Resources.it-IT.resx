@@ -123,12 +123,6 @@
   <data name="PluginDescription" xml:space="preserve">
     <value>Apre i preferiti di Microsoft Edge</value>
   </data>
-  <data name="Option_SearchTree_Label" xml:space="preserve">
-    <value>Cerca come albero</value>
-  </data>
-  <data name="Option_SearchTree_Description" xml:space="preserve">
-    <value>Naviga l'albero delle cartelle durante la ricerca.</value>
-  </data>
   <data name="Option_ExcludedProfiles_Label" xml:space="preserve">
     <value>Profili esclusi</value>
   </data>
@@ -191,5 +185,20 @@
   </data>
   <data name="Option_Channel_Label" xml:space="preserve">
     <value>Canale</value>
+  </data>
+  <data name="Option_SearchMode_Label" xml:space="preserve">
+    <value>Modalità di ricerca</value>
+  </data>
+  <data name="Option_SearchMode_Description" xml:space="preserve">
+    <value>Specifica come vengono cercati i preferiti</value>
+  </data>
+  <data name="SearchMode_Flat" xml:space="preserve">
+    <value>Piatta (preferiti e cartelle)</value>
+  </data>
+  <data name="SearchMode_Tree" xml:space="preserve">
+    <value>Albero</value>
+  </data>
+  <data name="SearchMode_FlatFavorites" xml:space="preserve">
+    <value>Piatta (solo preferiti)</value>
   </data>
 </root>

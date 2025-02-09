@@ -24,11 +24,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public static string UrlIcoPath { get; private set; } = string.Empty;
 
-        private const string SearchTree = nameof(SearchTree);
         private const string ExcludedProfiles = nameof(ExcludedProfiles);
         private const string EdgeChannel = nameof(EdgeChannel);
-        private const bool SearchTreeDefault = false;
-        private const int DefaultChannel = 0;
+        private const string Mode = nameof(Mode);
 
         private readonly WoxLogger _logger;
         private readonly EdgeManager _edgeManager;
@@ -36,11 +34,18 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         private readonly FavoriteQuery _favoriteQuery;
         private PluginInitContext? _context;
 
-        private bool _searchTree;
         private ReadOnlyCollection<string> _excludedProfiles = ReadOnlyCollection<string>.Empty;
-        private Channel _channel = 0;
+        private Channel _channel = Channel.Stable;
+        private SearchMode _searchMode = SearchMode.Flat;
 
         private bool _disposed;
+
+        private static readonly List<KeyValuePair<string, string>> _searchModes = new()
+        {
+            new KeyValuePair<string, string>(GetLocalizedSearchMode(SearchMode.Flat), SearchMode.Flat.ToString("D")),
+            new KeyValuePair<string, string>(GetLocalizedSearchMode(SearchMode.FlatFavorites), SearchMode.FlatFavorites.ToString("D")),
+            new KeyValuePair<string, string>(GetLocalizedSearchMode(SearchMode.Tree), SearchMode.Tree.ToString("D")),
+        };
 
         private static readonly List<KeyValuePair<string, string>> _channels = new()
         {
@@ -58,11 +63,12 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
         {
             new()
             {
-                PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Checkbox,
-                Key = SearchTree,
-                Value = SearchTreeDefault,
-                DisplayLabel = Resources.Option_SearchTree_Label,
-                DisplayDescription = Resources.Option_SearchTree_Description,
+                PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
+                Key = Mode,
+                DisplayLabel = Resources.Option_SearchMode_Label,
+                DisplayDescription = Resources.Option_SearchMode_Description,
+                ComboBoxItems = _searchModes,
+                ComboBoxValue = (int)SearchMode.Flat,
             },
             new()
             {
@@ -80,7 +86,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                 DisplayLabel = Resources.Option_Channel_Label,
                 DisplayDescription = Resources.Option_Channel_Description,
                 ComboBoxItems = _channels,
-                ComboBoxValue = DefaultChannel,
+                ComboBoxValue = (int)Channel.Stable,
             },
         };
 
@@ -127,14 +133,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
             var showProfileName = _profileManager.FavoriteProviders.Count > 1;
 
-            if (_searchTree)
+            if (_searchMode == SearchMode.Tree)
             {
                 return _favoriteQuery
                     .Search(query.Search)
                     .OrderBy(f => f.Type)
                     .ThenBy(f => f.Name)
                     .Where(f => !f.IsEmptySpecialFolder)
-                    .Select(f => f.ToResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, _searchTree))
+                    .Select(f => f.ToResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, true))
                     .ToList();
             }
             else
@@ -144,10 +150,15 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
                 foreach (var favorite in _favoriteQuery.GetAll().Where(f => !f.IsEmptySpecialFolder))
                 {
+                    if (favorite.Type == FavoriteType.Folder && _searchMode == SearchMode.FlatFavorites)
+                    {
+                        continue;
+                    }
+
                     var score = StringMatcher.FuzzySearch(query.Search, favorite.Name);
                     if (emptyQuery || score.Score > 0)
                     {
-                        var result = favorite.ToResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, _searchTree);
+                        var result = favorite.ToResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, false);
                         result.Score = score.Score;
                         result.TitleHighlightData = score.MatchData;
                         results.Add(result);
@@ -170,13 +181,12 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
             if (settings != null && settings.AdditionalOptions != null)
             {
-                _searchTree = settings.AdditionalOptions.FirstOrDefault(x => x.Key == SearchTree)?.Value ?? SearchTreeDefault;
+                _searchMode = (SearchMode)(settings.AdditionalOptions.FirstOrDefault(x => x.Key == Mode)?.ComboBoxValue ?? (int)SearchMode.Flat);
                 _excludedProfiles = settings.AdditionalOptions.FirstOrDefault(x => x.Key == ExcludedProfiles)?.TextValueAsMultilineList.AsReadOnly() ?? ReadOnlyCollection<string>.Empty;
-                _channel = (Channel)(settings.AdditionalOptions.FirstOrDefault(x => x.Key == EdgeChannel)?.ComboBoxValue ?? DefaultChannel);
+                _channel = (Channel)(settings.AdditionalOptions.FirstOrDefault(x => x.Key == EdgeChannel)?.ComboBoxValue ?? (int)Channel.Stable);
             }
             else
             {
-                _searchTree = SearchTreeDefault;
                 _excludedProfiles = ReadOnlyCollection<string>.Empty;
             }
 
@@ -236,6 +246,17 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                 Channel.Beta => Resources.Channel_Beta,
                 Channel.Dev => Resources.Channel_Dev,
                 Channel.Canary => Resources.Channel_Canary,
+                _ => string.Empty,
+            };
+        }
+
+        private static string GetLocalizedSearchMode(SearchMode searchMode)
+        {
+            return searchMode switch
+            {
+                SearchMode.Flat => Resources.SearchMode_Flat,
+                SearchMode.FlatFavorites => Resources.SearchMode_FlatFavorites,
+                SearchMode.Tree => Resources.SearchMode_Tree,
                 _ => string.Empty,
             };
         }

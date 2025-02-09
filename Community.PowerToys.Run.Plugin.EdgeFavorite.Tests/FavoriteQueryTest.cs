@@ -31,14 +31,14 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Should_Get_All_Favorites()
         {
             var result = _singleFavoriteQuery.GetAll();
-            Assert.AreEqual(result.Count(), 14);
+            Assert.AreEqual(14, result.Count());
         }
 
         [TestMethod]
         public void Should_Get_All_Favorites_From_All_Profiles()
         {
             var result = _multiFavoriteQuery.GetAll();
-            Assert.AreEqual(result.Count(), 19);
+            Assert.AreEqual(19, result.Count());
         }
 
         [DataTestMethod]
@@ -64,21 +64,21 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Tests
         public void Should_Get_Expected_Result(string search, int expectedResult)
         {
             var result = _singleFavoriteQuery.Search(search);
-            Assert.AreEqual(result.Count(), expectedResult);
+            Assert.AreEqual(expectedResult, result.Count());
         }
 
         [TestMethod]
         public void Should_Get_Folder_Twice()
         {
             var result = _multiFavoriteQuery.Search("Codi");
-            Assert.AreEqual(result.Count(), 2);
+            Assert.AreEqual(2, result.Count());
         }
 
         [TestMethod]
         public void Should_Merge_Folders_Content()
         {
             var result = _multiFavoriteQuery.Search("Coding/");
-            Assert.AreEqual(result.Count(), 8);
+            Assert.AreEqual(8, result.Count());
         }
     }
 }

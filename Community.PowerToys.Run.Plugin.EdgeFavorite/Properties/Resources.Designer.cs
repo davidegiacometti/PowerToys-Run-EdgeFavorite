@@ -250,20 +250,20 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Navigate the folder tree when searching..
+        ///   Looks up a localized string similar to Specify how favorites are searched.
         /// </summary>
-        internal static string Option_SearchTree_Description {
+        internal static string Option_SearchMode_Description {
             get {
-                return ResourceManager.GetString("Option_SearchTree_Description", resourceCulture);
+                return ResourceManager.GetString("Option_SearchMode_Description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search as tree.
+        ///   Looks up a localized string similar to Search mode.
         /// </summary>
-        internal static string Option_SearchTree_Label {
+        internal static string Option_SearchMode_Label {
             get {
-                return ResourceManager.GetString("Option_SearchTree_Label", resourceCulture);
+                return ResourceManager.GetString("Option_SearchMode_Label", resourceCulture);
             }
         }
         
@@ -282,6 +282,33 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite.Properties {
         internal static string PluginName {
             get {
                 return ResourceManager.GetString("PluginName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Flat (favorites and folders).
+        /// </summary>
+        internal static string SearchMode_Flat {
+            get {
+                return ResourceManager.GetString("SearchMode_Flat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Flat (favorites only).
+        /// </summary>
+        internal static string SearchMode_FlatFavorites {
+            get {
+                return ResourceManager.GetString("SearchMode_FlatFavorites", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tree.
+        /// </summary>
+        internal static string SearchMode_Tree {
+            get {
+                return ResourceManager.GetString("SearchMode_Tree", resourceCulture);
             }
         }
     }
