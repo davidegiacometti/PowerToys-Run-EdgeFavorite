@@ -7,8 +7,9 @@
   "Author": "davidegiacometti",
   "Version": "1.0.0",
   "Language": "csharp",
-  "Website": "https://aka.ms/powertoys",
+  "Website": "https://github.com/davidegiacometti/PowerToys-Run-EdgeFavorite",
   "ExecuteFileName": "Community.PowerToys.Run.Plugin.EdgeFavorite.dll",
   "IcoPathDark": "Images\\EdgeFavorite.dark.png",
-  "IcoPathLight": "Images\\EdgeFavorite.light.png"
+  "IcoPathLight": "Images\\EdgeFavorite.light.png",
+  "DynamicLoading": true
 }

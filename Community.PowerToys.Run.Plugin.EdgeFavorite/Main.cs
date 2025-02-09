@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Models;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Models;
+using Community.PowerToys.Run.Plugin.EdgeFavorite.Core.Services;
 using Community.PowerToys.Run.Plugin.EdgeFavorite.Properties;
-using Community.PowerToys.Run.Plugin.EdgeFavorite.Services;
 using ManagedCommon;
 using Microsoft.PowerToys.Settings.UI.Library;
 using Wox.Infrastructure;
@@ -20,12 +20,17 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
     {
         public static string PluginID => "D73A7EF0633F4C82A14454FFD848F447";
 
+        public static string FolderIcoPath { get; private set; } = string.Empty;
+
+        public static string UrlIcoPath { get; private set; } = string.Empty;
+
         private const string SearchTree = nameof(SearchTree);
         private const string ExcludedProfiles = nameof(ExcludedProfiles);
         private const string EdgeChannel = nameof(EdgeChannel);
         private const bool SearchTreeDefault = false;
         private const int DefaultChannel = 0;
 
+        private readonly WoxLogger _logger;
         private readonly EdgeManager _edgeManager;
         private readonly ProfileManager _profileManager;
         private readonly FavoriteQuery _favoriteQuery;
@@ -39,10 +44,10 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         private static readonly List<KeyValuePair<string, string>> _channels = new()
         {
-            new KeyValuePair<string, string>(Channel.Stable.ToLocalizedString(), Channel.Stable.ToString("D")),
-            new KeyValuePair<string, string>(Channel.Beta.ToLocalizedString(), Channel.Beta.ToString("D")),
-            new KeyValuePair<string, string>(Channel.Dev.ToLocalizedString(), Channel.Dev.ToString("D")),
-            new KeyValuePair<string, string>(Channel.Canary.ToLocalizedString(), Channel.Canary.ToString("D")),
+            new KeyValuePair<string, string>(GetLocalizedChannel(Channel.Stable), Channel.Stable.ToString("D")),
+            new KeyValuePair<string, string>(GetLocalizedChannel(Channel.Beta), Channel.Beta.ToString("D")),
+            new KeyValuePair<string, string>(GetLocalizedChannel(Channel.Dev), Channel.Dev.ToString("D")),
+            new KeyValuePair<string, string>(GetLocalizedChannel(Channel.Canary), Channel.Canary.ToString("D")),
         };
 
         public string Name => Resources.PluginName;
@@ -81,8 +86,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public Main()
         {
-            _edgeManager = new EdgeManager();
-            _profileManager = new ProfileManager(_edgeManager);
+            _logger = new WoxLogger();
+            _edgeManager = new EdgeManager(_logger);
+            _profileManager = new ProfileManager(_logger, _edgeManager);
             _favoriteQuery = new FavoriteQuery(_profileManager);
         }
 
@@ -110,7 +116,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                 {
                     new Result
                     {
-                        Title = string.Format(Resources.MissingChannel_Title, _channel.ToLocalizedString()),
+                        Title = string.Format(Resources.MissingChannel_Title, GetLocalizedChannel(_channel)),
                         SubTitle = Resources.MissingChannel_Subtitle,
                         IcoPath = theme == Theme.Light || theme == Theme.HighContrastWhite
                             ? "Images/Warning.light.png"
@@ -128,7 +134,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                     .OrderBy(f => f.Type)
                     .ThenBy(f => f.Name)
                     .Where(f => !f.IsEmptySpecialFolder)
-                    .Select(f => f.CreateResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, _searchTree))
+                    .Select(f => f.ToResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, _searchTree))
                     .ToList();
             }
             else
@@ -141,7 +147,7 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
                     var score = StringMatcher.FuzzySearch(query.Search, favorite.Name);
                     if (emptyQuery || score.Score > 0)
                     {
-                        var result = favorite.CreateResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, _searchTree);
+                        var result = favorite.ToResult(_context!.API, _edgeManager, query.ActionKeyword, showProfileName, _searchTree);
                         result.Score = score.Score;
                         result.TitleHighlightData = score.MatchData;
                         results.Add(result);
@@ -187,12 +193,9 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         public List<ContextMenuResult> LoadContextMenus(Result selectedResult)
         {
-            if (selectedResult.ContextData is not FavoriteItem favorite)
-            {
-                return new();
-            }
-
-            return favorite.CreateContextMenuResult(_edgeManager);
+            return selectedResult.ContextData is FavoriteItem favorite
+                ? favorite.ToContextMenuResults(_logger, _edgeManager)
+                : new();
         }
 
         public void Dispose()
@@ -213,7 +216,28 @@ namespace Community.PowerToys.Run.Plugin.EdgeFavorite
 
         private static void UpdateIconsPath(Theme theme)
         {
-            FavoriteItem.SetIcons(theme);
+            if (theme == Theme.Light || theme == Theme.HighContrastWhite)
+            {
+                FolderIcoPath = "Images/Folder.light.png";
+                UrlIcoPath = "Images/Url.light.png";
+            }
+            else
+            {
+                FolderIcoPath = "Images/Folder.dark.png";
+                UrlIcoPath = "Images/Url.dark.png";
+            }
+        }
+
+        private static string GetLocalizedChannel(Channel channel)
+        {
+            return channel switch
+            {
+                Channel.Stable => Resources.Channel_Stable,
+                Channel.Beta => Resources.Channel_Beta,
+                Channel.Dev => Resources.Channel_Dev,
+                Channel.Canary => Resources.Channel_Canary,
+                _ => string.Empty,
+            };
         }
     }
 }

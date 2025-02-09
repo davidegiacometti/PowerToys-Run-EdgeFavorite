@@ -3,6 +3,11 @@
     <Version>0.9.0</Version>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
     <AdditionalFiles Include="..\StyleCop.json" Link="StyleCop.json" />
