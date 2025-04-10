@@ -24,7 +24,7 @@ jobs:
       - name: Read version
         run: |
           [xml]$xml = Get-Content -Path Directory.Build.Props
-          echo "PLUGIN_VERSION=$($xml.Project.PropertyGroup.Version)" >> $env:GITHUB_ENV
+          echo "PLUGIN_VERSION=$("$($xml.Project.PropertyGroup.Version)".Trim())" >> $env:GITHUB_ENV
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
